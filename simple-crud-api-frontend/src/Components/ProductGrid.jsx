@@ -14,15 +14,21 @@ const ProductGrid = ({ products, loading, error }) => {
           {products.map((product) => (
             <div key={product._id} className="col-sm-6 col-md-4 col-lg-3 mb-4">
               <div className="card h-100">
+                {/* Check if image exists and render */}
                 <img
-                  src={product.image || 'https://via.placeholder.com/150'} // Fallback image
+                  src={
+                    product.image && product.image.imageBase64
+                      ? `data:${product.image.contentType};base64,${product.image.imageBase64}`
+                      : 'https://via.placeholder.com/150'
+                  }
                   className="card-img-top"
                   alt={product.name}
                 />
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title">{product.name}</h5>
                   <p className="card-text">{product.quantity}</p>
-                  <p className="text-muted mt-auto">${product.price}</p>
+                  <p className="text-muted mt-auto">Price: ${product.price}</p>
+                  <p className="card-text">Description: {product.description}</p>
                   <button className="btn btn-primary">Buy Now</button>
                 </div>
               </div>

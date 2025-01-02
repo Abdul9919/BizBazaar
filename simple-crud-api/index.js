@@ -10,7 +10,6 @@ const port = 5000;
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 // Connect to Database
 connectDB();

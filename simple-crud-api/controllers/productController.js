@@ -1,16 +1,16 @@
-const product = require('../models/product.model.js');
+const Product = require('../models/product.model.js');
 
+// Get all products or search products
 const getProducts = async (req, res) => {
   try {
     const { search } = req.query;
     let filter = {};
 
     if (search) {
-      filter.name = { $regex: search, $options: 'i' }; // case-insensitive search
+      filter.name = { $regex: search, $options: 'i' }; // Case-insensitive search
     }
 
-    // Fetch the products based on the filter (empty filter returns all products)
-    const allProducts = await product.find(filter);
+    const allProducts = await Product.find(filter);
     res.status(200).json(allProducts);
   } catch (error) {
     console.error('Error fetching products:', error.message);
@@ -18,13 +18,11 @@ const getProducts = async (req, res) => {
   }
 };
 
-
-
-
+// Get a single product by ID
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const singleProduct = await product.findById(id);
+    const singleProduct = await Product.findById(id);
     if (!singleProduct) {
       return res.status(404).json({ message: 'Product not found' });
     }
@@ -35,10 +33,11 @@ const getProductById = async (req, res) => {
   }
 };
 
+// Get products by name
 const getProductByName = async (req, res) => {
   try {
     const { name } = req.params;
-    const products = await product.find({
+    const products = await Product.find({
       name: { $regex: name, $options: 'i' }, // Case-insensitive partial match
     });
     if (products.length === 0) {
@@ -51,9 +50,25 @@ const getProductByName = async (req, res) => {
   }
 };
 
+// Create a new product
 const createProduct = async (req, res) => {
   try {
-    const newProduct = await product.create(req.body);
+    if (!req.file) {
+      return res.status(400).json({ message: 'Image file is required' });
+    }
+
+    const newProduct = await Product.create({
+      name: req.body.name,
+      price: req.body.price,
+      quantity: req.body.quantity,
+      description: req.body.description,
+      image: {
+        filename: req.file.originalname,
+        contentType: req.file.mimetype,
+        imageBase64: req.file.buffer.toString('base64'),
+      },
+    });
+
     res.status(201).json(newProduct); // Use 201 for created
   } catch (error) {
     console.error('Error creating product:', error.message);
@@ -61,10 +76,11 @@ const createProduct = async (req, res) => {
   }
 };
 
+// Update a product by ID
 const updateProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedProduct = await product.findByIdAndUpdate(id, req.body, {
+    const updatedProduct = await Product.findByIdAndUpdate(id, req.body, {
       new: true, // Return the updated document
       runValidators: true, // Validate updates
     });
@@ -80,10 +96,11 @@ const updateProductById = async (req, res) => {
   }
 };
 
+// Update a product by name
 const updateProductByName = async (req, res) => {
   try {
     const { name } = req.params;
-    const updatedProduct = await product.findOneAndUpdate(
+    const updatedProduct = await Product.findOneAndUpdate(
       { name: { $regex: `^${name}$`, $options: 'i' } }, // Exact case-insensitive match
       req.body,
       {
@@ -103,10 +120,11 @@ const updateProductByName = async (req, res) => {
   }
 };
 
+// Delete a product by ID
 const deleteProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedProduct = await product.findByIdAndDelete(id);
+    const deletedProduct = await Product.findByIdAndDelete(id);
 
     if (!deletedProduct) {
       return res.status(404).json({ message: 'Product not found' });
@@ -119,10 +137,11 @@ const deleteProductById = async (req, res) => {
   }
 };
 
+// Delete a product by name
 const deleteProductByName = async (req, res) => {
   try {
     const { name } = req.params;
-    const deletedProduct = await product.findOneAndDelete({
+    const deletedProduct = await Product.findOneAndDelete({
       name: { $regex: `^${name}$`, $options: 'i' }, // Exact case-insensitive match
     });
 

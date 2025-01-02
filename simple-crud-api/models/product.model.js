@@ -16,9 +16,14 @@ const productSchema = mongoose.Schema(
             required: true,
             default: 0,
         },
-        image: {
+        description : {
             type: String,
             required: false,
+        },
+        image: {
+            filename: { type: String, required: true },
+            contentType: { type: String, required: true },
+            imageBase64: { type: String, required: true },
         }
     },
     {
