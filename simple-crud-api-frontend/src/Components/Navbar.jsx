@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // Ensure axios is installed
+import axios from 'axios';
 
 export const Navbar = ({ onProductsFetched }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -9,10 +9,9 @@ export const Navbar = ({ onProductsFetched }) => {
 
     if (searchTerm.trim()) {
       try {
-        // Make an API request to get filtered products based on the search term
         const response = await axios.get(`/api/products?search=${searchTerm}`);
-        console.log('Fetched products:', response.data); // Debugging: Check the data
-        onProductsFetched(response.data); // Update the products state in the parent component
+        console.log('Fetched products:', response.data);
+        onProductsFetched(response.data);
       } catch (error) {
         console.error('Error fetching products:', error.message);
         alert('Failed to fetch products.');
@@ -53,7 +52,7 @@ export const Navbar = ({ onProductsFetched }) => {
             </li>
           </ul>
 
-          <form className="d-flex" onSubmit={handleSearch}>
+          <form className="d-flex me-2" onSubmit={handleSearch}>
             <input
               className="form-control me-2"
               type="search"
@@ -66,6 +65,13 @@ export const Navbar = ({ onProductsFetched }) => {
               Search
             </button>
           </form>
+
+          <button className="btn btn-outline-light me-2" type="button">
+            Login
+          </button>
+          <button className="btn btn-outline-light" type="button">
+            Register
+          </button>
         </div>
       </div>
     </nav>
