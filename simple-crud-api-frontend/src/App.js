@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar } from './Components/Navbar'; // Import your Navbar component
 import ProductGrid from './Components/ProductGrid'; // Import your ProductGrid component
+import Register from './Components/RegisterPage'; // Import the Register component
+import Login from './Components/LoginPage'; // Import the Login component
+import { AuthProvider } from './Components/AuthContext'; // Import AuthProvider
 
 const App = () => {
   const [products, setProducts] = useState([]);
@@ -31,10 +35,21 @@ const App = () => {
   };
 
   return (
-    <div>
-      <Navbar onProductsFetched={handleProductsFetched} /> {/* Pass handleProductsFetched to Navbar */}
-      <ProductGrid products={products} loading={loading} error={error} />
-    </div>
+    <AuthProvider>
+      <Router>
+        <div>
+          <Navbar onProductsFetched={handleProductsFetched} /> {/* Pass handleProductsFetched to Navbar */}
+          <Routes>
+            <Route
+              path="/"
+              element={<ProductGrid products={products} loading={loading} error={error} />}
+            />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 };
 

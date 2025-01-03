@@ -1,11 +1,13 @@
-const User = require('../models/userModel')
-const jwt = require('jsonwebtoken')
+const User = require('../models/userModel');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-// Fixed the issue in the generateToken function
+// Generate JWT Token
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 }
 
+// Register User
 const registerUser = async (req, res) => {
     const { userName, email, password } = req.body;
 
@@ -19,10 +21,10 @@ const registerUser = async (req, res) => {
 
         if (user) {
             res.status(201).json({
-                _id: user._id,  // Fixed: used _id instead of id to match MongoDB convention
+                _id: user._id,
                 userName: user.userName,
                 email: user.email,
-                token: generateToken(user._id),  // Fixed: used _id instead of id
+                token: generateToken(user._id),
             });
         } else {
             res.status(400).json({ message: "Invalid user data" });
@@ -33,6 +35,7 @@ const registerUser = async (req, res) => {
     }
 };
 
+// Login User
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
@@ -41,9 +44,9 @@ const loginUser = async (req, res) => {
 
         if (user && (await user.matchPassword(password))) {
             res.json({
-                _id: user._id,  // Fixed: used _id instead of id
+                _id: user._id,
                 userName: user.userName,
-                token: generateToken(user._id),  // Fixed: used _id instead of id
+                token: generateToken(user._id),
             });
         } else {
             res.status(401).json({ message: 'Invalid email or password' });
@@ -54,13 +57,14 @@ const loginUser = async (req, res) => {
     }
 };
 
+// Get User Profile
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);  // Assuming req.user.id is set after JWT authentication
+        const user = await User.findById(req.user.id);
 
         if (user) {
             res.json({
-                _id: user._id,  // Fixed: used _id instead of id
+                _id: user._id,
                 userName: user.userName,
                 email: user.email,
             });

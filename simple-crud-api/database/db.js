@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect('mongodb+srv://admin:admin@backenddb.fek2y.mongodb.net/node-api?retryWrites=true&w=majority&appName=backendDB', {
+    const conn = await mongoose.connect(process.env.MONGODB || 'mongodb+srv://admin:admin@backenddb.fek2y.mongodb.net/node-api?retryWrites=true&w=majority&appName=backendDB', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
