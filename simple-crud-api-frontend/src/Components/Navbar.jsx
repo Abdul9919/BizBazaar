@@ -33,7 +33,7 @@ export const Navbar = ({ onProductsFetched }) => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
             <div className="container-fluid">
-                <a className="navbar-brand" href="/">Product Search</a>
+                <a className="navbar-brand" href="/">Biz Bazaar</a>
                 <button
                     className="navbar-toggler"
                     type="button"

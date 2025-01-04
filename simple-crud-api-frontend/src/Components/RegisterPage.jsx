@@ -1,5 +1,5 @@
-// Register.js
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const Register = () => {
     const [form, setForm] = useState({
@@ -9,20 +9,39 @@ const Register = () => {
         confirmPassword: '',
     });
 
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm({ ...form, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Perform registration logic here
-        console.log('User registered:', form);
+        if (form.password !== form.confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        try {
+            const response = await axios.post('/api/users/register', {
+                userName: form.username,
+                email: form.email,
+                password: form.password,
+            });
+            setSuccess('User registered successfully');
+            console.log('User registered:', response.data);
+        } catch (error) {
+            setError(error.response?.data?.message || 'An error occurred');
+        }
     };
 
     return (
         <div className="container mt-5">
             <h2>Register</h2>
+            {error && <div className="alert alert-danger">{error}</div>}
+            {success && <div className="alert alert-success">{success}</div>}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="username" className="form-label">Username</label>
