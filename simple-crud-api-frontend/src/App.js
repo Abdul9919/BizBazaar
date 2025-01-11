@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar } from './Components/Navbar'; // Import your Navbar component
 import ProductGrid from './Components/ProductGrid'; // Import your ProductGrid component
 import Register from './Components/RegisterPage'; // Import the Register component
 import Login from './Components/LoginPage'; // Import the Login component
+import Dashboard from './Components/Dashboard'; // Import your Dashboard component
 import { AuthProvider, AuthContext } from './Components/AuthContext'; // Import AuthProvider and AuthContext
 
 const App = () => {
@@ -46,6 +47,11 @@ const App = () => {
             />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            {/* Protected Dashboard Route */}
+            <Route
+              path="/dashboard"
+              element={<PrivateRoute component={Dashboard} />}
+            />
           </Routes>
         </div>
       </Router>
@@ -60,6 +66,18 @@ const ProductGridWrapper = ({ products, loading, error }) => {
   return (
     <ProductGrid products={products} loading={loading} error={error} username={username} />
   );
+};
+
+// Private Route component to protect the dashboard
+const PrivateRoute = ({ component: Component }) => {
+  const { user } = useContext(AuthContext);
+
+  // If the user is not logged in, redirect to login page
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  return <Component />;
 };
 
 export default App;

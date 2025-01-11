@@ -7,19 +7,22 @@ export const Navbar = ({ onProductsFetched }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [username, setUsername] = useState('');
     const navigate = useNavigate();
-    const { isAuthenticated, logout } = useContext(AuthContext);
+    const { isAuthenticated, logout, user } = useContext(AuthContext);  // Destructure `user` too
 
     useEffect(() => {
-        // Retrieve the username from localStorage when the component mounts
         const storedUsername = localStorage.getItem('username');
         if (storedUsername) {
             setUsername(storedUsername);
         }
     }, []);
 
+    // Debugging: check isAuthenticated value
+    useEffect(() => {
+        console.log('isAuthenticated:', isAuthenticated);
+    }, [isAuthenticated]);
+
     const handleSearch = async (event) => {
         event.preventDefault();
-
         if (searchTerm.trim()) {
             try {
                 const response = await axios.get(`/api/products?search=${searchTerm}`);
@@ -37,6 +40,14 @@ export const Navbar = ({ onProductsFetched }) => {
     const handleLogout = () => {
         logout();
         navigate('/');
+    };
+
+    const handleDashboardClick = () => {
+        if (isAuthenticated) {
+            navigate('/dashboard');
+        } else {
+            navigate('/login');
+        }
     };
 
     return (
@@ -93,6 +104,13 @@ export const Navbar = ({ onProductsFetched }) => {
                                 onClick={handleLogout}
                             >
                                 Logout
+                            </button>
+                            <button
+                                className="btn btn-outline-light ms-2"
+                                type="button"
+                                onClick={handleDashboardClick}  // Add this click handler
+                            >
+                                Dashboard
                             </button>
                         </div>
                     ) : (

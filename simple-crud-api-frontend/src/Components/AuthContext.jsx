@@ -9,16 +9,24 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    
     if (token) {
-      axios.get('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+      console.log("Token found in localStorage:", token);
+      
+      axios.get('/api/users/me', { headers: { authorization: `Bearer ${token}` } })
         .then(response => {
+          console.log("User authenticated:", response.data);
           setUser(response.data);
           setIsAuthenticated(true);
         })
-        .catch(() => {
+        .catch(error => {
+          console.error("Error verifying token:", error);
           localStorage.removeItem('token');
           setIsAuthenticated(false);
         });
+    } else {
+      console.log("No token found in localStorage");
+      setIsAuthenticated(false);
     }
   }, []);
 
@@ -26,12 +34,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', token);
     setUser(userInfo);
     setIsAuthenticated(true);
+    console.log("User logged in:", userInfo);
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
     setIsAuthenticated(false);
+    console.log("User logged out.");
   };
 
   return (
