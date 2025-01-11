@@ -1,8 +1,10 @@
 import React from 'react';
 
-const ProductGrid = ({ products, loading, error }) => {
+const ProductGrid = ({ products, loading, error, username }) => {
   return (
     <div className="container mt-4">
+      {/* Conditionally render the welcome message if the username exists */}
+      {username && <h3 className="text-center mb-4">Welcome, {username}!</h3>}
       <h2 className="text-center mb-4">Our Products</h2>
 
       {loading && <p className="text-center">Loading products...</p>}
@@ -17,8 +19,8 @@ const ProductGrid = ({ products, loading, error }) => {
                 {/* Check if image exists and render */}
                 <img
                   src={
-                    product.image && product.image.imageBase64
-                      ? `data:${product.image.contentType};base64,${product.image.imageBase64}`
+                    product.image
+                      ? product.image
                       : 'https://via.placeholder.com/150'
                   }
                   className="card-img-top"

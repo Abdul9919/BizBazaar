@@ -1,27 +1,41 @@
-const express = require('express')
-const product = require('../models/product.model.js')
-const {getProductByName,updateProductByName,deleteProductByName,getProducts, getProductById,deleteProductById, createProduct,updateProductById} = require('../controllers/productController.js')
-const { model } = require('mongoose')
-const multer = require('multer');
-const router = express.Router()
+import express from 'express';
+import {
+  getProducts,
+  getProductById,
+  getProductByName,
+  createProduct,
+  updateProductById,
+  updateProductByName,
+  deleteProductById,
+  deleteProductByName,
+} from '../controllers/productController.js';
 
-const storage = multer.memoryStorage();
+import multer from 'multer';
+const router = express.Router();
+
+// Multer configuration for saving images
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directory where files will be saved
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
+  },
+});
 const upload = multer({ storage });
 
- router.get('/', getProducts)
+// Routes
+router.get('/', getProducts);
+router.get('/:id', getProductById);
+router.get('/byname/:name', getProductByName);
 
- router.get('/:id', getProductById)
+router.post('/', upload.single('image'), createProduct); // File upload middleware for image
 
- router.get('/byname/:name', getProductByName)
- 
- router.post('/', upload.single('image'), createProduct)
+router.put('/:id', updateProductById);
+router.put('/byname/:name', updateProductByName);
 
- router.put('/:id', updateProductById)
+router.delete('/:id', deleteProductById);
+router.delete('/byname/:name', deleteProductByName);
 
- router.put('/byname/:name', updateProductByName)
-
- router.delete('/:id', deleteProductById)
-
- router.delete('/byname/:name', deleteProductByName)
-
- module.exports = router
+export default router;

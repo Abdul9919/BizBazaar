@@ -5,8 +5,17 @@ import { AuthContext } from './AuthContext';
 
 export const Navbar = ({ onProductsFetched }) => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [username, setUsername] = useState('');
     const navigate = useNavigate();
     const { isAuthenticated, logout } = useContext(AuthContext);
+
+    useEffect(() => {
+        // Retrieve the username from localStorage when the component mounts
+        const storedUsername = localStorage.getItem('username');
+        if (storedUsername) {
+            setUsername(storedUsername);
+        }
+    }, []);
 
     const handleSearch = async (event) => {
         event.preventDefault();
@@ -76,15 +85,18 @@ export const Navbar = ({ onProductsFetched }) => {
                     </form>
 
                     {isAuthenticated ? (
-                        <button
-                            className="btn btn-outline-light"
-                            type="button"
-                            onClick={handleLogout}
-                        >
-                            Logout
-                        </button>
+                        <div className="d-flex align-items-center">
+                            <span className="navbar-text text-light me-2">Welcome, {username}</span>
+                            <button
+                                className="btn btn-outline-light"
+                                type="button"
+                                onClick={handleLogout}
+                            >
+                                Logout
+                            </button>
+                        </div>
                     ) : (
-                        <>
+                        <div className="d-flex">
                             <button
                                 className="btn btn-outline-light me-2"
                                 type="button"
@@ -99,7 +111,7 @@ export const Navbar = ({ onProductsFetched }) => {
                             >
                                 Register
                             </button>
-                        </>
+                        </div>
                     )}
                 </div>
             </div>

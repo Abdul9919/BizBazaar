@@ -1,8 +1,21 @@
-const Product = require('../models/product.model.js');
+import Product from '../models/product.model.js';
+import path from 'path';
+import multer from 'multer';
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directory to save the images
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
+  },
+});
+const upload = multer({ storage });
 // Get all products or search products
 const getProducts = async (req, res) => {
   try {
+
     const { search } = req.query;
     let filter = {};
 
@@ -57,16 +70,19 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ message: 'Image file is required' });
     }
 
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
     const newProduct = await Product.create({
       name: req.body.name,
       price: req.body.price,
       quantity: req.body.quantity,
       description: req.body.description,
-      image: {
+      image: imageUrl,
+      /*image: {
         filename: req.file.originalname,
         contentType: req.file.mimetype,
         imageBase64: req.file.buffer.toString('base64'),
-      },
+      },*/
     });
 
     res.status(201).json(newProduct); // Use 201 for created
@@ -156,7 +172,7 @@ const deleteProductByName = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   getProducts,
   getProductById,
   createProduct,
@@ -165,4 +181,5 @@ module.exports = {
   getProductByName,
   updateProductByName,
   deleteProductByName,
+  upload
 };

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar } from './Components/Navbar'; // Import your Navbar component
 import ProductGrid from './Components/ProductGrid'; // Import your ProductGrid component
 import Register from './Components/RegisterPage'; // Import the Register component
 import Login from './Components/LoginPage'; // Import the Login component
-import { AuthProvider } from './Components/AuthContext'; // Import AuthProvider
+import { AuthProvider, AuthContext } from './Components/AuthContext'; // Import AuthProvider and AuthContext
 
 const App = () => {
   const [products, setProducts] = useState([]);
@@ -42,7 +42,7 @@ const App = () => {
           <Routes>
             <Route
               path="/"
-              element={<ProductGrid products={products} loading={loading} error={error} />}
+              element={<ProductGridWrapper products={products} loading={loading} error={error} />}
             />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
@@ -50,6 +50,15 @@ const App = () => {
         </div>
       </Router>
     </AuthProvider>
+  );
+};
+
+const ProductGridWrapper = ({ products, loading, error }) => {
+  const { user } = useContext(AuthContext);
+  const username = user ? user.username : null;
+
+  return (
+    <ProductGrid products={products} loading={loading} error={error} username={username} />
   );
 };
 
