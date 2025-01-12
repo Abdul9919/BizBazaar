@@ -7,16 +7,18 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
+  // Check if a valid token exists on initial load
   useEffect(() => {
     const token = localStorage.getItem('token');
     
     if (token) {
       console.log("Token found in localStorage:", token);
       
+      // Check the user details using the token (e.g., fetching user profile)
       axios.get('/api/users/me', { headers: { authorization: `Bearer ${token}` } })
         .then(response => {
           console.log("User authenticated:", response.data);
-          setUser(response.data);
+          setUser(response.data); // Store the user data (including username)
           setIsAuthenticated(true);
         })
         .catch(error => {
@@ -29,10 +31,11 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(false);
     }
   }, []);
+  
 
   const login = (token, userInfo) => {
     localStorage.setItem('token', token);
-    setUser(userInfo);
+    setUser(userInfo); // Set user info including username
     setIsAuthenticated(true);
     console.log("User logged in:", userInfo);
   };

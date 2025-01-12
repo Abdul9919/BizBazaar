@@ -16,13 +16,8 @@ const ProductGrid = ({ products, loading, error, username }) => {
           {products.map((product) => (
             <div key={product._id} className="col-sm-6 col-md-4 col-lg-3 mb-4">
               <div className="card h-100">
-                {/* Check if image exists and render */}
                 <img
-                  src={
-                    product.image
-                      ? product.image
-                      : 'https://via.placeholder.com/150'
-                  }
+                  src={product.image ? product.image : 'https://via.placeholder.com/150'}
                   className="card-img-top"
                   alt={product.name}
                 />
@@ -31,6 +26,12 @@ const ProductGrid = ({ products, loading, error, username }) => {
                   <p className="card-text">{product.quantity}</p>
                   <p className="text-muted mt-auto">Price: ${product.price}</p>
                   <p className="card-text">Description: {product.description}</p>
+                  {/* Check if userName exists and display it */}
+                  {product.user_id && product.user_id.userName && (
+                    <p className="text-muted mt-2">
+                      Added by: <strong>{product.user_id.userName}</strong>
+                    </p>
+                  )}
                   <button className="btn btn-primary">Buy Now</button>
                 </div>
               </div>

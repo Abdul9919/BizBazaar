@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { AuthContext } from './AuthContext';
 
 const Dashboard = () => {
+    const { user } = React.useContext(AuthContext);
     const [products, setProducts] = useState([]);
     const [newProduct, setNewProduct] = useState({
         name: '',
@@ -9,13 +11,14 @@ const Dashboard = () => {
         description: '',
         quantity: '',
         image: null,
+        user_id: user.id, // User's ID from context
+        userName: user.userName,
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const token = localStorage.getItem('token');  // Get JWT token from localStorage
+    const token = localStorage.getItem('token'); // JWT token from localStorage
 
-    // Define fetchProducts function outside of useEffect
     const fetchProducts = async () => {
         setLoading(true);
         try {
@@ -31,7 +34,7 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-        fetchProducts(); // Call fetchProducts once on component mount
+        fetchProducts();
     }, [token]);
 
     const handleAddProduct = async (e) => {
@@ -40,8 +43,8 @@ const Dashboard = () => {
         formData.append('name', newProduct.name);
         formData.append('price', newProduct.price);
         formData.append('description', newProduct.description);
-        formData.append('image', newProduct.image);
         formData.append('quantity', newProduct.quantity);
+        formData.append('image', newProduct.image);
 
         try {
             await axios.post('/api/products', formData, {
@@ -50,8 +53,14 @@ const Dashboard = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            setNewProduct({ quantity: '', name: '', price: '', description: '', image: null });
-            fetchProducts();  // Refresh product list
+            setNewProduct({
+                name: '',
+                price: '',
+                description: '',
+                quantity: '',
+                image: null,
+            });
+            fetchProducts(); // Refresh product list
         } catch (err) {
             setError('Failed to add product');
         }
@@ -62,7 +71,7 @@ const Dashboard = () => {
             await axios.delete(`/api/products/${productId}`, {
                 headers: { authorization: `Bearer ${token}` },
             });
-            fetchProducts();  // Refresh product list
+            fetchProducts();
         } catch (err) {
             setError('Failed to delete product');
         }
@@ -79,10 +88,10 @@ const Dashboard = () => {
 
             {/* Add Product Form */}
             <div className="bg-white shadow-md p-6 rounded-lg mb-8">
-                <h2 className="text-2xl font-semibold mb-4 text-black-500">Add Product</h2>
+                <h2 className="text-2xl font-semibold mb-4">Add Product</h2>
                 <form onSubmit={handleAddProduct}>
                     <div className="mb-4">
-                        <label className="block text-black-700">Product Name</label>
+                        <label className="block text-gray-700">Product Name</label>
                         <input
                             type="text"
                             name="name"
@@ -118,7 +127,8 @@ const Dashboard = () => {
 
                     <div className="mb-4">
                         <label className="block text-gray-700">Quantity</label>
-                        <textarea
+                        <input
+                            type="number"
                             name="quantity"
                             value={newProduct.quantity}
                             onChange={handleProductChange}
@@ -137,13 +147,13 @@ const Dashboard = () => {
                         />
                     </div>
 
-                    <button type="submit" className="w-full bg-blue-500 text-gray-700 p-3 rounded-lg">
+                    <button type="submit" className="w-full bg-blue-500 text-white p-3 rounded-lg">
                         Add Product
                     </button>
                 </form>
             </div>
 
-            {/* Error handling */}
+            {/* Error Handling */}
             {error && <div className="text-red-500 text-center mb-4">{error}</div>}
 
             {/* Product List */}
@@ -158,15 +168,17 @@ const Dashboard = () => {
                                 <img
                                     src={product.image}
                                     alt={product.name}
-                                    className="w-20 h-20 object-cover mb-4 rounded-lg"
-                                    style={{height: '8rem', width: '8rem'}}
+                                    className="w-full h-40 object-cover mb-4 rounded-lg"
                                 />
-
-
                                 <h3 className="font-semibold text-lg">{product.name}</h3>
                                 <p className="text-gray-500">{product.description}</p>
                                 <p className="text-xl font-semibold mt-2">${product.price}</p>
-                                <p className="text-xl font-semibold mt-2">{product.quantity}</p>
+                                <p className="text-sm text-gray-600">
+                                    Quantity: {product.quantity}
+                                </p>
+                                <p className="text-muted mt-2">
+                                    Added by: <strong>{product.user_id ? product.user_id.userName : 'Unknown'}</strong>
+                                </p>
 
                                 <div className="mt-4 flex justify-between">
                                     <button
@@ -176,7 +188,7 @@ const Dashboard = () => {
                                         Update
                                     </button>
                                     <button
-                                        className="bg-red-500 text-gray-700 px-4 py-2 rounded-lg"
+                                        className="bg-red-500 text-white px-4 py-2 rounded-lg"
                                         onClick={() => handleDeleteProduct(product._id)}
                                     >
                                         Delete

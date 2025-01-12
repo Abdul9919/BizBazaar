@@ -9,6 +9,7 @@ import {
   deleteProductById,
   deleteProductByName,
 } from '../controllers/productController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 import multer from 'multer';
 const router = express.Router();
@@ -30,7 +31,7 @@ router.get('/', getProducts);
 router.get('/:id', getProductById);
 router.get('/byname/:name', getProductByName);
 
-router.post('/', upload.single('image'), createProduct); // File upload middleware for image
+router.post('/', upload.single('image'),protect, createProduct); // File upload middleware for image
 
 router.put('/:id', updateProductById);
 router.put('/byname/:name', updateProductByName);

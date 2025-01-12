@@ -21,6 +21,7 @@ const productSchema = mongoose.Schema(
       required: false,
     },
     image: { type: String },
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
  /*   },
     imageFilename: { 
       type: String, // Store the filename of the uploaded image

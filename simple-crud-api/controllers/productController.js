@@ -15,21 +15,27 @@ const upload = multer({ storage });
 // Get all products or search products
 const getProducts = async (req, res) => {
   try {
-
     const { search } = req.query;
     let filter = {};
 
+    // If search query exists, apply a case-insensitive search filter
     if (search) {
       filter.name = { $regex: search, $options: 'i' }; // Case-insensitive search
     }
 
-    const allProducts = await Product.find(filter);
+    // Fetch products and populate the `user` field to get the username
+    const allProducts = await Product.find(filter)
+      .populate('user_id', 'userName')  // Populate username from User model using the user_id
+      .exec();
+
+    // Send the products with the username included
     res.status(200).json(allProducts);
   } catch (error) {
     console.error('Error fetching products:', error.message);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Get a single product by ID
 const getProductById = async (req, res) => {
@@ -66,31 +72,40 @@ const getProductByName = async (req, res) => {
 // Create a new product
 const createProduct = async (req, res) => {
   try {
+    // Ensure the user is authenticated (you might already have middleware for that)
+    if (!req.user) {
+      return res.status(401).json({ message: 'User is not authenticated' });
+    }
+
     if (!req.file) {
       return res.status(400).json({ message: 'Image file is required' });
     }
 
+    // Generate image URL from uploaded file
     const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
+    // Create a new product, including the logged-in user's username
     const newProduct = await Product.create({
       name: req.body.name,
       price: req.body.price,
       quantity: req.body.quantity,
       description: req.body.description,
       image: imageUrl,
-      /*image: {
-        filename: req.file.originalname,
-        contentType: req.file.mimetype,
-        imageBase64: req.file.buffer.toString('base64'),
-      },*/
+      user_id: req.user.id,     // Assuming the user ID is available in req.user
+      userName: req.user.userName, // Get the logged-in user's username from req.user
     });
 
-    res.status(201).json(newProduct); // Use 201 for created
+    // Send a success response with the created product
+    res.status(201).json({
+      message: 'Product created successfully',
+      product: newProduct,
+    });
   } catch (error) {
     console.error('Error creating product:', error.message);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Update a product by ID
 const updateProductById = async (req, res) => {
