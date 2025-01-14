@@ -2,12 +2,15 @@ import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
+import icon from '../Assets/favicon.png'
+import { FaSearch } from 'react-icons/fa';
+import { FaUser } from 'react-icons/fa';
 
 export const Navbar = ({ onProductsFetched }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [username, setUsername] = useState('');
     const navigate = useNavigate();
-    const { isAuthenticated, logout, user } = useContext(AuthContext);  // Destructure `user` too
+    const { isAuthenticated, logout, user } = useContext(AuthContext);
 
     useEffect(() => {
         const storedUsername = localStorage.getItem('username');
@@ -15,11 +18,6 @@ export const Navbar = ({ onProductsFetched }) => {
             setUsername(storedUsername);
         }
     }, []);
-
-    // Debugging: check isAuthenticated value
-    useEffect(() => {
-        console.log('isAuthenticated:', isAuthenticated);
-    }, [isAuthenticated]);
 
     const handleSearch = async (event) => {
         event.preventDefault();
@@ -51,87 +49,108 @@ export const Navbar = ({ onProductsFetched }) => {
     };
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div className="container-fluid">
-                <a className="navbar-brand" href="/">Biz Bazaar</a>
-                <button
-                    className="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                    aria-controls="navbarNav"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-                >
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav me-auto">
-                        <li className="nav-item">
-                            <a className="nav-link active" aria-current="page" href="/">Home</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="/">About</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="/">Services</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="/">Contact</a>
-                        </li>
-                    </ul>
+        <nav className="rounded-lg flex items-center justify-between bg-gradient-to-tr from-slate-950 to-slate-500 px-6 py-4">
+            {/* Left Section */}
+            <div className="flex items-center space-x-6">
+                <img src={icon} alt="" className='h-10 w-10 mr-1' />
+                <a className="text-white text-2xl font-bold m-0" href="/">Biz Bazaar</a>
+                <ul className="flex space-x-4">
+                    <li>
+                        <a className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" href="/">
+                            <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
+                            <span className="relative z-10">Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" href="/">
+                            <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
+                            <span className="relative z-10">About</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" href="/">
+                            <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
+                            <span className="relative z-10">Services</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-200 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" href="/">
+                            <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
+                            <span className="relative z-10">Contact</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-                    <form className="d-flex me-2" onSubmit={handleSearch}>
-                        <input
-                            className="form-control me-2"
-                            type="search"
-                            placeholder="Search"
-                            aria-label="Search"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <button className="btn btn-outline-light" type="submit">
-                            Search
+
+
+            {/* Right Section */}
+            <div className="flex items-center space-x-6">
+                {/* Search Form */}
+                <FaSearch className="mr-2 text-slate-300 text-lg" />
+                <form className="flex items-center space-x-2 m-0" onSubmit={handleSearch}>
+                    <input
+                        className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700"
+                        type="search"
+                        placeholder="Search"
+                        aria-label="Search"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <button
+                        className="relative text-stone-800 hover:text-white px-4 py-2 rounded-lg overflow-hidden group bg-slate-200"
+                        type="submit"
+                    >
+                        <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left"></span>
+                        <span className="relative z-10">Search</span>
+                    </button>
+
+
+
+                </form>
+
+                {/* Authenticated/Unauthenticated Options */}
+                {isAuthenticated ? (
+                    <div className="flex items-center space-x-4">
+                        <span className="text-white">Welcome, {username}</span>
+                        <button
+                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 flex items-center space-x-2"
+                            type="button"
+                            onClick={handleLogout}
+                        >
+                            <span>Logout</span>
                         </button>
-                    </form>
+                        <button
+                            className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 flex items-center space-x-2"
+                            type="button"
+                            onClick={handleDashboardClick}
+                        >
+                            <FaUser className="text-white text-sm" /> {/* Person icon */}
+                            <span>Dashboard</span>
+                        </button>
+                    </div>
 
-                    {isAuthenticated ? (
-                        <div className="d-flex align-items-center">
-                            <span className="navbar-text text-light me-2">Welcome, {username}</span>
-                            <button
-                                className="btn btn-outline-light"
-                                type="button"
-                                onClick={handleLogout}
-                            >
-                                Logout
-                            </button>
-                            <button
-                                className="btn btn-outline-light ms-2"
-                                type="button"
-                                onClick={handleDashboardClick}  // Add this click handler
-                            >
-                                Dashboard
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="d-flex">
-                            <button
-                                className="btn btn-outline-light me-2"
-                                type="button"
-                                onClick={() => navigate('/login')}
-                            >
-                                Login
-                            </button>
-                            <button
-                                className="btn btn-outline-light"
-                                type="button"
-                                onClick={() => navigate('/register')}
-                            >
-                                Register
-                            </button>
-                        </div>
-                    )}
-                </div>
+                ) : (
+                    <div className="flex items-center space-x-4">
+                        <button
+                            className="relative text-white  transition-all text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-stone-950"
+                            type="button"
+                            onClick={() => navigate('/login')}
+                        >
+                            <span className="absolute inset-0 bg-slate-200 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
+                            <span className="relative z-10 hover:text-stone-600 transition">Login</span>
+                        </button>
+                        <button
+                            className="relative text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-stone-950"
+                            type="button"
+                            onClick={() => navigate('/register')}
+                        >
+                            <span className="absolute inset-0 bg-slate-200 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
+                            <span className="relative z-10 hover:text-stone-600 transition">Register</span>
+                        </button>
+                    </div>
+
+                )}
             </div>
         </nav>
     );
