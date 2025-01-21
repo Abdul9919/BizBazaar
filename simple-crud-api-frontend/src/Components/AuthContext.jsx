@@ -14,16 +14,16 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       console.log("Token found in localStorage:", token);
       
-      // Check the user details using the token (e.g., fetching user profile)
+      // Fetch user profile with the token to verify if it's valid
       axios.get('/api/users/me', { headers: { authorization: `Bearer ${token}` } })
         .then(response => {
           console.log("User authenticated:", response.data);
-          setUser(response.data); // Store the user data (including username)
+          setUser(response.data); // Store the user data
           setIsAuthenticated(true);
         })
         .catch(error => {
           console.error("Error verifying token:", error);
-          localStorage.removeItem('token');
+          localStorage.removeItem('token'); // Remove invalid token
           setIsAuthenticated(false);
         });
     } else {
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (token, userInfo) => {
     localStorage.setItem('token', token);
-    setUser(userInfo); // Set user info including username
+    setUser(userInfo); // Set the user data (username, email, etc.)
     setIsAuthenticated(true);
     console.log("User logged in:", userInfo);
   };

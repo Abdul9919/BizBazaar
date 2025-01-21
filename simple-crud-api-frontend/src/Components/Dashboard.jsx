@@ -17,15 +17,17 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const token = localStorage.getItem('token'); // JWT token from localStorage
+    const token = localStorage.getItem('token'); // Ensure the token is stored in localStorage
 
     const fetchProducts = async () => {
         setLoading(true);
         try {
             const response = await axios.get('/api/products', {
-                headers: { authorization: `Bearer ${token}` },
+                headers: { authorization: `Bearer ${token}` }, // Correct header format
             });
-            setProducts(response.data);
+            // Filter the products to only show those added by the logged-in user
+            const userProducts = response.data.filter(product => product.user_id._id === user.id);
+            setProducts(userProducts);
         } catch (err) {
             setError('Failed to fetch products');
         } finally {
@@ -163,39 +165,43 @@ const Dashboard = () => {
                 <div className="bg-white shadow-md p-6 rounded-lg">
                     <h2 className="text-2xl font-semibold mb-4">Your Products</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {products.map((product) => (
-                            <div key={product._id} className="border border-gray-300 rounded-lg p-4">
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="w-full h-40 object-cover mb-4 rounded-lg"
-                                />
-                                <h3 className="font-semibold text-lg">{product.name}</h3>
-                                <p className="text-gray-500">{product.description}</p>
-                                <p className="text-xl font-semibold mt-2">${product.price}</p>
-                                <p className="text-sm text-gray-600">
-                                    Quantity: {product.quantity}
-                                </p>
-                                <p className="text-muted mt-2">
-                                    Added by: <strong>{product.user_id ? product.user_id.userName : 'Unknown'}</strong>
-                                </p>
+                        {products.length === 0 ? (
+                            <p className="text-center">You have not added any products yet.</p>
+                        ) : (
+                            products.map((product) => (
+                                <div key={product._id} className="border border-gray-300 rounded-lg p-4">
+                                    <img
+                                        src={product.image}
+                                        alt={product.name}
+                                        className="w-full h-40 object-cover mb-4 rounded-lg"
+                                    />
+                                    <h3 className="font-semibold text-lg">{product.name}</h3>
+                                    <p className="text-gray-500">{product.description}</p>
+                                    <p className="text-xl font-semibold mt-2">${product.price}</p>
+                                    <p className="text-sm text-gray-600">
+                                        Quantity: {product.quantity}
+                                    </p>
+                                    <p className="text-muted mt-2">
+                                        Added by: <strong>{product.user_id ? product.user_id.userName : 'Unknown'}</strong>
+                                    </p>
 
-                                <div className="mt-4 flex justify-between">
-                                    <button
-                                        className="bg-yellow-500 text-gray-700 px-4 py-2 rounded-lg"
-                                        onClick={() => alert('Update Product functionality goes here')}
-                                    >
-                                        Update
-                                    </button>
-                                    <button
-                                        className="bg-red-500 text-white px-4 py-2 rounded-lg"
-                                        onClick={() => handleDeleteProduct(product._id)}
-                                    >
-                                        Delete
-                                    </button>
+                                    <div className="mt-4 flex justify-between">
+                                        <button
+                                            className="bg-yellow-500 text-gray-700 px-4 py-2 rounded-lg"
+                                            onClick={() => alert('Update Product functionality goes here')}
+                                        >
+                                            Update
+                                        </button>
+                                        <button
+                                            className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                                            onClick={() => handleDeleteProduct(product._id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
                 </div>
             )}

@@ -8,32 +8,34 @@ const ProductGrid = ({ products, loading, error, username }) => {
       <h2 className="text-center mb-4">Our Products</h2>
 
       {loading && <p className="text-center">Loading products...</p>}
-      {error && <p className="text-center text-danger">{error}</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
 
       {!loading && !error && (
-        <div className="row">
+        <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
           {products.length === 0 && <p className="text-center">No products found.</p>}
           {products.map((product) => (
-            <div key={product._id} className="col-sm-6 col-md-4 col-lg-3 mb-4">
-              <div className="card h-100">
-                <img
-                  src={product.image ? product.image : 'https://via.placeholder.com/150'}
-                  className="card-img-top"
-                  alt={product.name}
-                />
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title">{product.name}</h5>
-                  <p className="card-text">{product.quantity}</p>
-                  <p className="text-muted mt-auto">Price: ${product.price}</p>
-                  <p className="card-text">Description: {product.description}</p>
-                  {/* Check if userName exists and display it */}
-                  {product.user_id && product.user_id.userName && (
-                    <p className="text-muted mt-2">
-                      Added by: <strong>{product.user_id.userName}</strong>
-                    </p>
-                  )}
-                  <button className="btn btn-primary">Buy Now</button>
-                </div>
+            <div key={product._id} className="group relative bg-white border rounded-lg shadow-md overflow-hidden">
+              <img
+                src={product.image ? product.image : 'https://via.placeholder.com/150'}
+                alt={product.name}
+                className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
+              />
+              <div className="p-4 flex flex-col">
+                <h5 className="text-lg font-semibold text-gray-900">{product.name}</h5>
+                <p className="text-sm text-gray-500">Quantity: {product.quantity}</p>
+                <p className="text-sm font-medium text-gray-900 mt-auto">Price: ${product.price}</p>
+                <p className="text-sm text-gray-500">Description: {product.description}</p>
+
+                {/* Check if userName exists and display it */}
+                {product.user_id && product.user_id.userName && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    Added by: <strong>{product.user_id.userName}</strong>
+                  </p>
+                )}
+
+                <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition-all duration-300 ease-in-out">
+                  Buy Now
+                </button>
               </div>
             </div>
           ))}

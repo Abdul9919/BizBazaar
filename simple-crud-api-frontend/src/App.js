@@ -26,9 +26,10 @@ const App = () => {
         setLoading(false);
       }
     };
-
+  
     fetchProducts();
   }, []); // Empty dependency array ensures this only runs once on page load
+  // Empty dependency array ensures this only runs once on page load
 
   // Function to update the products state based on search results
   const handleProductsFetched = (newProducts) => {
@@ -60,13 +61,11 @@ const App = () => {
 };
 
 const ProductGridWrapper = ({ products, loading, error }) => {
-  const { user } = useContext(AuthContext);
-  const username = user ? user.username : null;
-
   return (
-    <ProductGrid products={products} loading={loading} error={error} username={username} />
+    <ProductGrid products={products} loading={loading} error={error} />
   );
 };
+
 
 // Private Route component to protect the dashboard
 const PrivateRoute = ({ component: Component }) => {

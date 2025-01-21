@@ -33,10 +33,10 @@ router.get('/byname/:name', getProductByName);
 
 router.post('/', upload.single('image'),protect, createProduct); // File upload middleware for image
 
-router.put('/:id', updateProductById);
+router.put('/:id', protect,updateProductById);
 router.put('/byname/:name', updateProductByName);
 
-router.delete('/:id', deleteProductById);
+router.delete('/:id', protect, deleteProductById);
 router.delete('/byname/:name', deleteProductByName);
 
 export default router;

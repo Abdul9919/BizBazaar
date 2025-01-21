@@ -12,24 +12,26 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
+
 // Get all products or search products
 const getProducts = async (req, res) => {
   try {
-    const { search } = req.query;
-    let filter = {};
+    // If the user is authenticated, filter products by user_id
+    const filter = req.user ? { user_id: req.user.id } : {};  // If no user, no filter applied
 
-    // If search query exists, apply a case-insensitive search filter
+    const { search } = req.query;
+    
+    // If a search query is provided, filter products by name
     if (search) {
       filter.name = { $regex: search, $options: 'i' }; // Case-insensitive search
     }
 
-    // Fetch products and populate the `user` field to get the username
+    // Fetch products based on the filter criteria
     const allProducts = await Product.find(filter)
-      .populate('user_id', 'userName')  // Populate username from User model using the user_id
+      .populate('user_id', 'userName')
       .exec();
 
-    // Send the products with the username included
-    res.status(200).json(allProducts);
+    res.status(200).json(allProducts); // Return the fetched products
   } catch (error) {
     console.error('Error fetching products:', error.message);
     res.status(500).json({ message: error.message });
@@ -57,7 +59,7 @@ const getProductByName = async (req, res) => {
   try {
     const { name } = req.params;
     const products = await Product.find({
-      name: { $regex: name, $options: 'i' }, // Case-insensitive partial match
+      name: { $regex: name, $options: 'i' },
     });
     if (products.length === 0) {
       return res.status(404).json({ message: 'No products found with that name' });
@@ -72,7 +74,6 @@ const getProductByName = async (req, res) => {
 // Create a new product
 const createProduct = async (req, res) => {
   try {
-    // Ensure the user is authenticated (you might already have middleware for that)
     if (!req.user) {
       return res.status(401).json({ message: 'User is not authenticated' });
     }
@@ -81,24 +82,24 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ message: 'Image file is required' });
     }
 
-    // Generate image URL from uploaded file
-    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    const imagePath = `/uploads/${req.file.filename}`;
 
-    // Create a new product, including the logged-in user's username
     const newProduct = await Product.create({
       name: req.body.name,
       price: req.body.price,
       quantity: req.body.quantity,
       description: req.body.description,
-      image: imageUrl,
-      user_id: req.user.id,     // Assuming the user ID is available in req.user
-      userName: req.user.userName, // Get the logged-in user's username from req.user
+      image: imagePath,
+      user_id: req.user.id,
+      userName: req.user.userName,
     });
 
-    // Send a success response with the created product
     res.status(201).json({
       message: 'Product created successfully',
-      product: newProduct,
+      product: {
+        ...newProduct.toObject(),
+        image: `${req.protocol}://${req.get('host')}${imagePath}`,
+      },
     });
   } catch (error) {
     console.error('Error creating product:', error.message);
@@ -106,23 +107,27 @@ const createProduct = async (req, res) => {
   }
 };
 
-
 // Update a product by ID
 const updateProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedProduct = await Product.findByIdAndUpdate(id, req.body, {
-      new: true, // Return the updated document
-      runValidators: true, // Validate updates
-    });
 
-    if (!updatedProduct) {
+    const product = await Product.findById(id);
+    if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+    if (product.user_id.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Unauthorized action' });
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     res.status(200).json(updatedProduct);
   } catch (error) {
-    console.error('Error updating product by ID:', error.message);
+    console.error('Error updating product:', error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -132,11 +137,11 @@ const updateProductByName = async (req, res) => {
   try {
     const { name } = req.params;
     const updatedProduct = await Product.findOneAndUpdate(
-      { name: { $regex: `^${name}$`, $options: 'i' } }, // Exact case-insensitive match
+      { name: { $regex: `^${name}$`, $options: 'i' } },
       req.body,
       {
-        new: true, // Return the updated document
-        runValidators: true, // Validate updates
+        new: true,
+        runValidators: true,
       }
     );
 
@@ -155,15 +160,19 @@ const updateProductByName = async (req, res) => {
 const deleteProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedProduct = await Product.findByIdAndDelete(id);
 
-    if (!deletedProduct) {
+    const product = await Product.findById(id);
+    if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+    if (product.user_id.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Unauthorized action' });
+    }
 
+    await Product.findByIdAndDelete(id);
     res.status(200).json({ message: 'Product deleted successfully' });
   } catch (error) {
-    console.error('Error deleting product by ID:', error.message);
+    console.error('Error deleting product:', error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -173,7 +182,7 @@ const deleteProductByName = async (req, res) => {
   try {
     const { name } = req.params;
     const deletedProduct = await Product.findOneAndDelete({
-      name: { $regex: `^${name}$`, $options: 'i' }, // Exact case-insensitive match
+      name: { $regex: `^${name}$`, $options: 'i' },
     });
 
     if (!deletedProduct) {
@@ -195,6 +204,6 @@ export {
   deleteProductById,
   getProductByName,
   updateProductByName,
-  deleteProductByName,
+  deleteProductByName, // Ensure this function is exported
   upload
 };

@@ -2,7 +2,6 @@ import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
-import icon from "../Assets/favicon.png";
 
 const LoginPage = () => {
     const [form, setForm] = useState({
@@ -26,9 +25,13 @@ const LoginPage = () => {
                 password: form.password,
             });
             const token = response.data.token;
-            login(token); // Use the login function from AuthContext
+            const userInfo = response.data.user;  // Assuming the response includes user info
+
+            // Store the token and user info in the context and localStorage
+            login(token, userInfo);
+
             console.log('User logged in:', form);
-            navigate('/'); // Redirect to homepage after login
+            navigate('/'); // Redirect to homepage or dashboard after login
         } catch (error) {
             console.error('Error logging in:', error.response?.data?.message || error.message);
             setError(error.response?.data?.message || 'Failed to log in. Please check your credentials and try again.');
@@ -38,12 +41,6 @@ const LoginPage = () => {
     return (
         <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                {/*<img
-                    className="mx-auto h-10 w-auto"
-                    src={icon}
-                    alt="Your Company"
-                />*/}
-
                 <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">Sign in to your account</h2>
             </div>
 
@@ -66,9 +63,7 @@ const LoginPage = () => {
                     </div>
 
                     <div>
-                        <div className="flex items-center justify-between">
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-900">Password</label>
-                        </div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-900">Password</label>
                         <div className="mt-2">
                             <input
                                 type="password"
@@ -89,7 +84,6 @@ const LoginPage = () => {
                         >
                             Sign in
                         </button>
-
                     </div>
                 </form>
             </div>
