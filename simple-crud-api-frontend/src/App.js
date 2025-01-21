@@ -71,6 +71,7 @@ const ProductGridWrapper = ({ products, loading, error }) => {
 const PrivateRoute = ({ component: Component }) => {
   const { user } = useContext(AuthContext);
 
+
   // If the user is not logged in, redirect to login page
   if (!user) {
     return <Navigate to="/login" />;

@@ -29,8 +29,8 @@ const LoginPage = () => {
 
             // Store the token and user info in the context and localStorage
             login(token, userInfo);
+            console.log(userInfo)
 
-            console.log('User logged in:', form);
             navigate('/'); // Redirect to homepage or dashboard after login
         } catch (error) {
             console.error('Error logging in:', error.response?.data?.message || error.message);

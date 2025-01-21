@@ -1,6 +1,6 @@
-import User  from '../models/userModel.js';
-import jwt  from 'jsonwebtoken';
-import bcrypt  from 'bcryptjs';
+import User from '../models/userModel.js';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -76,4 +76,28 @@ const getUserProfile = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser, getUserProfile };
+const getUserById = async (req, res) => {
+    try {
+        const fetchedId = req.params.id;
+        if (!fetchedId) {
+            res.status(400).json({ message: 'User ID is required' });
+        }
+        else {
+            const user = await User.findById(fetchedId);
+            if (user) {
+                res.json({
+                    _id: user._id,
+                    userName: user.userName,
+                    email: user.email,
+                });
+            } else {
+                res.status(404).json({ message: 'User not found' });
+            }
+        }
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export { registerUser, loginUser, getUserProfile, getUserById };

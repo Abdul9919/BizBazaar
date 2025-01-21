@@ -13,18 +13,25 @@ export const Navbar = ({ onProductsFetched }) => {
   const { isAuthenticated, logout, user } = useContext(AuthContext);
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-      setUsername(storedUsername);
-    }
-  }, []);
+    const fetchUsername = async () => {
+      if (user?.id) {
+        try {
+          const response = await axios.get(`/api/users/profile/${user.id}`);
+          setUsername(response.data.userName); // Adjust based on your API response structure
+        } catch (error) {
+          console.error('Error fetching username:', error.message);
+        }
+      }
+    };
+
+    fetchUsername();
+  }, [user]);
 
   const handleSearch = async (event) => {
     event.preventDefault();
     if (searchTerm.trim()) {
       try {
         const response = await axios.get(`/api/products?search=${searchTerm}`);
-        console.log('Fetched products:', response.data);
         onProductsFetched(response.data);
       } catch (error) {
         console.error('Error fetching products:', error.message);
@@ -64,7 +71,7 @@ export const Navbar = ({ onProductsFetched }) => {
 
         {/* Menu Items */}
         <ul className={`flex space-x-4 ${menuOpen ? 'block' : 'hidden'} lg:flex`}>
-          <li>
+        <li>
             <a className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" href="/">
               <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
               <span className="relative z-10">Home</span>
@@ -116,7 +123,7 @@ export const Navbar = ({ onProductsFetched }) => {
         {/* Authenticated/Unauthenticated Options */}
         {isAuthenticated ? (
           <div className="flex items-center space-x-4">
-            <span className="text-white">Welcome, {username}</span>
+            <span className="text-white">Welcome, <span className='text-zinc-800 font-bold text-lg'>{username}</span></span>
             <button
               className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 flex items-center space-x-2"
               type="button"
