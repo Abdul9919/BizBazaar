@@ -60,7 +60,7 @@ export const Navbar = ({ onProductsFetched }) => {
       {/* Left Section */}
       <div className="flex items-center space-x-6">
         <img src={icon} alt="" className="h-10 w-10 mr-1" />
-        <a className="text-white text-2xl font-bold m-0" href="/">Biz Bazaar</a>
+        <link className="text-white text-2xl font-bold m-0" to="/">Biz Bazaar</link>
 
         {/* Hamburger Icon */}
         <div className="lg:hidden">
@@ -72,28 +72,28 @@ export const Navbar = ({ onProductsFetched }) => {
         {/* Menu Items */}
         <ul className={`flex space-x-4 ${menuOpen ? 'block' : 'hidden'} lg:flex`}>
         <li>
-            <a className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" href="/">
+            <link className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" to="/">
               <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
               <span className="relative z-10">Home</span>
-            </a>
+            </link>
           </li>
           <li>
-            <a className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" href="/">
+            <link className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" to="/">
               <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
               <span className="relative z-10">About</span>
-            </a>
+            </link>
           </li>
           <li>
-            <a className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" href="/">
+            <link className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" to="/">
               <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
               <span className="relative z-10">Services</span>
-            </a>
+            </link>
           </li>
           <li>
-            <a className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-200 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" href="/">
+            <link className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-200 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200" to="/">
               <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
               <span className="relative z-10">Contact</span>
-            </a>
+            </link>
           </li>
         </ul>
       </div>
