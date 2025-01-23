@@ -22,7 +22,7 @@ const Dashboard = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('/api/products', {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/products`, {
                 headers: { authorization: `Bearer ${token}` }, // Correct header format
             });
             // Filter the products to only show those added by the logged-in user
@@ -49,7 +49,7 @@ const Dashboard = () => {
         formData.append('image', newProduct.image);
 
         try {
-            await axios.post('/api/products', formData, {
+            await axios.post(`${process.env.REACT_APP_API_URL}/api/products`, formData, {
                 headers: {
                     authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
@@ -70,7 +70,7 @@ const Dashboard = () => {
 
     const handleDeleteProduct = async (productId) => {
         try {
-            await axios.delete(`/api/products/${productId}`, {
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/products/${productId}`, {
                 headers: { authorization: `Bearer ${token}` },
             });
             fetchProducts();

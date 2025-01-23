@@ -82,7 +82,7 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ message: 'Image file is required' });
     }
 
-    const imagePath = `/uploads/${req.file.filename}`;
+    const imagePath = `${process.env.SERVER_URL}/uploads/${req.file.filename}`;
 
     const newProduct = await Product.create({
       name: req.body.name,

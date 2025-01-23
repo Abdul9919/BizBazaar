@@ -15,7 +15,7 @@ export const Navbar = ({ onProductsFetched }) => {
     const fetchUsername = async () => {
       if (user?.id) {
         try {
-          const response = await axios.get(`/api/users/profile/${user.id}`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/profile/${user.id}`);
           setUsername(response.data.userName); // Adjust based on your API response structure
         } catch (error) {
           console.error('Error fetching username:', error.message);
@@ -30,7 +30,7 @@ export const Navbar = ({ onProductsFetched }) => {
     event.preventDefault();
     if (searchTerm.trim()) {
       try {
-        const response = await axios.get(`/api/products?search=${searchTerm}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/products?search=${searchTerm}`);
         onProductsFetched(response.data);
       } catch (error) {
         console.error('Error fetching products:', error.message);

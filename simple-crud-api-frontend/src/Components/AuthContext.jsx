@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       
       // Fetch user profile with the token to verify if it's valid
-      axios.get('/api/users/me', { headers: { authorization: `Bearer ${token}` } })
+      axios.get(`${process.env.REACT_APP_API_URL}/api/users/me`, { headers: { authorization: `Bearer ${token}` } })
         .then(response => {
           setUser(response.data); // Store the user data
           setIsAuthenticated(true);
