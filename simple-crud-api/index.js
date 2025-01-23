@@ -21,9 +21,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({
-  origin: 'http://localhost:3000', // Replace with your frontend URL
-}));
+app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to Database

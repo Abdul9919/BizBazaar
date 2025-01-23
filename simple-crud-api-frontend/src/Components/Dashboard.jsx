@@ -62,6 +62,7 @@ const Dashboard = () => {
                 quantity: '',
                 image: null,
             });
+            window.location.reload();
             fetchProducts(); // Refresh product list
         } catch (err) {
             setError('Failed to add product');
