@@ -14,6 +14,13 @@ const ChatWindow = ({ selectedUser }) => {
   // Debug selectedUser changes
 
   useEffect(() => {
+    const container = document.querySelector('.overflow-y-auto');
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages]);
+
+  useEffect(() => {
     console.log('SelectedUser details:', {
       id: selectedUser?.id,
       type: typeof selectedUser?.id,
@@ -25,7 +32,7 @@ const ChatWindow = ({ selectedUser }) => {
   const sendMessage = useCallback(async (e) => {
     e.preventDefault();
     console.log('Send button clicked');
-    
+
     // Validate input conditions
     if (!messageInput.trim() || !selectedUser?.id || !socket || isSending) {
       console.log('Blocked send attempt. Reasons:', {
@@ -58,7 +65,10 @@ const ChatWindow = ({ selectedUser }) => {
       setIsSending(true);
       setError(null);
       setMessageInput('');
-      setMessages(prev => [tempMessage, ...prev]);
+      setMessages(prev => [...prev, {
+        ...tempMessage,
+        timestamp: new Date(tempMessage.timestamp)
+      }]);
 
       socket.emit('sendMessage',
         {
@@ -87,7 +97,7 @@ const ChatWindow = ({ selectedUser }) => {
       console.error('Send failed:', err);
       setMessages(prev => prev.filter(msg => msg._id !== tempId));
       setMessageInput(messageInput);
-      setError(err.message.includes('Receiver not found') 
+      setError(err.message.includes('Receiver not found')
         ? 'User is no longer available'
         : 'Failed to send message'
       );
@@ -193,35 +203,35 @@ const ChatWindow = ({ selectedUser }) => {
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col-reverse">
-        <div className="space-y-4">
-          {messages.map((msg) => (
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages
+          .slice()
+          .sort((a, b) => a.timestamp - b.timestamp) // Newest first
+          .map((msg) => (
             <div
               key={msg._id}
               className={`flex ${msg.sender === user.id ? 'justify-end' : 'justify-start'}`}
             >
+              {/* ... rest of your message bubble code ... */}
               <div
-                className={`max-w-xs p-3 rounded-lg relative ${
-                  msg.sender === user.id
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white border'
-                } ${msg.status === 'sending' ? 'opacity-75' : ''}`}
-              >
-                <p>{msg.content}</p>
-                <p className={`text-xs mt-1 ${
-                  msg.sender === user.id ? 'text-blue-100' : 'text-gray-500'
-                }`}>
-                  {new Date(msg.timestamp).toLocaleTimeString('en-US', { 
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
-                  })}
-                  {msg.status === 'sending' && ' · Sending...'}
-                </p>
-              </div>
+                  className={`max-w-xs p-3 rounded-lg relative ${msg.sender === user.id
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white border'
+                    } ${msg.status === 'sending' ? 'opacity-75' : ''}`}
+                >
+                  <p>{msg.content}</p>
+                  <p className={`text-xs mt-1 ${msg.sender === user.id ? 'text-blue-100' : 'text-gray-500'
+                    }`}>
+                    {new Date(msg.timestamp).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true
+                    })}
+                    {msg.status === 'sending' && ' · Sending...'}
+                  </p>
+                </div>
             </div>
           ))}
-        </div>
       </div>
 
       {/* Message Input */}
