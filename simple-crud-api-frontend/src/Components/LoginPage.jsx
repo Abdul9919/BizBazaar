@@ -20,21 +20,28 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/users/login`, {
-                email: form.email,
-                password: form.password,
-            });
-            const token = response.data.token;
-            const userInfo = response.data.user;  // Assuming the response includes user info
-
-            // Store the token and user info in the context and localStorage
-            login(token, userInfo);
-            console.log(userInfo)
-            window.location.reload();
-            navigate('/'); // Redirect to homepage or dashboard after login
+            const { email, password } = form;
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/api/users/login`,
+                { email, password }
+            );
+    
+            // Verify response structure
+            console.log('Login response:', response.data);
+            
+            if (response.data && response.data._id) {
+                login(response.data.token, {
+                    _id: response.data._id,
+                    userName: response.data.userName,
+                    email: response.data.email
+                });
+                navigate('/');
+                window.location.reload();
+            } else {
+                console.error('Invalid response format');
+            }
         } catch (error) {
-            console.error('Error logging in:', error.response?.data?.message || error.message);
-            setError(error.response?.data?.message || 'Failed to log in. Please check your credentials and try again.');
+            console.error('Error logging in:', error.response?.data || error.message);
         }
     };
 

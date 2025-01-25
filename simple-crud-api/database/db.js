@@ -8,6 +8,10 @@ const connectDB = async () => {
       useUnifiedTopology: true,
     });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
+
+    if (!mongoose.models.User) {
+      throw new Error('User model not registered!');
+    }
   } catch (error) {
     console.error(`Error: ${error.message}`);
     process.exit(1); // Exit process with failure

@@ -1,24 +1,26 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import axios from 'axios';
-import { Navbar } from './Components/Navbar'; // Import your Navbar component
-import ProductGrid from './Components/ProductGrid'; // Import your ProductGrid component
-import Register from './Components/RegisterPage'; // Import the Register component
-import Login from './Components/LoginPage'; // Import the Login component
-import Dashboard from './Components/Dashboard'; // Import your Dashboard component
-import { AuthProvider, AuthContext } from './Components/AuthContext'; // Import AuthProvider and AuthContext
+import { Navbar } from './Components/Navbar';
+import ProductGrid from './Components/ProductGrid';
+import Register from './Components/RegisterPage';
+import Login from './Components/LoginPage';
+import Dashboard from './Components/Dashboard';
+import { AuthProvider, AuthContext } from './Components/AuthContext';
+import { SocketProvider } from './Components/socketContext';
+import ChatWindow from './Components/ChatWindow.jsx';
+import UserList from './Components/UserList';
 
 const App = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch all products initially when the page loads
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/products`);
-        setProducts(response.data); // Update the products state with the fetched data
+        setProducts(response.data);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching products:', err.message);
@@ -26,58 +28,108 @@ const App = () => {
         setLoading(false);
       }
     };
-  
-    fetchProducts();
-  }, []); // Empty dependency array ensures this only runs once on page load
-  // Empty dependency array ensures this only runs once on page load
 
-  // Function to update the products state based on search results
+    fetchProducts();
+  }, []);
+
   const handleProductsFetched = (newProducts) => {
     setProducts(newProducts);
   };
 
   return (
     <AuthProvider>
-      <Router>
-        <div>
-          <Navbar onProductsFetched={handleProductsFetched} /> {/* Pass handleProductsFetched to Navbar */}
-          <Routes>
-            <Route
-              path="/"
-              element={<ProductGridWrapper products={products} loading={loading} error={error} />}
-            />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            {/* Protected Dashboard Route */}
-            <Route
-              path="/dashboard"
-              element={<PrivateRoute component={Dashboard} />}
-            />
-          </Routes>
-        </div>
-      </Router>
+      <SocketProvider>
+        <Router>
+          <div className="app-container">
+            <Navbar onProductsFetched={handleProductsFetched} />
+            <Routes>
+              <Route
+                path="/"
+                element={<ProductGridWrapper products={products} loading={loading} error={error} />}
+              />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/dashboard"
+                element={<PrivateRoute />}
+              />
+              <Route
+                path="/chat"
+                element={
+                  <PrivateRoute>
+                    <ChatInterface />
+                  </PrivateRoute>
+                }
+              />
+            </Routes>
+          </div>
+        </Router>
+      </SocketProvider>
     </AuthProvider>
   );
 };
 
-const ProductGridWrapper = ({ products, loading, error }) => {
+const ChatInterface = () => {
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // Debug selected user changes
+  useEffect(() => {
+    console.log('Selected User in ChatInterface:', {
+      id: selectedUser?.id,
+      valid: selectedUser?.id ? /^[0-9a-fA-F]{24}$/.test(selectedUser.id) : false
+    });
+  }, [selectedUser]);
+
   return (
-    <ProductGrid products={products} loading={loading} error={error} />
+    <div className="flex h-screen">
+      {/* User List Sidebar */}
+      <div className="w-1/4 border-r bg-white">
+        <UserList 
+          onSelectUser={(user) => {
+            console.log('User selected:', user);
+            setSelectedUser({
+              id: user.id,
+              name: user.name,
+              email: user.email
+            });
+          }}
+        />
+      </div>
+
+      {/* Chat Window */}
+      <div className="flex-1 bg-gray-50">
+        {selectedUser?.id ? (
+          <ChatWindow key={selectedUser._id} selectedUser={selectedUser} />
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-500 text-lg">
+            Select a user from the sidebar to start chatting
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
+const ProductGridWrapper = ({ products, loading, error }) => {
+  return <ProductGrid products={products} loading={loading} error={error} />;
+};
 
-// Private Route component to protect the dashboard
-const PrivateRoute = ({ component: Component }) => {
-  const { user } = useContext(AuthContext);
+const PrivateRoute = ({ children }) => {
+  const { user } = useAuth();
 
-
-  // If the user is not logged in, redirect to login page
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
-  return <Component />;
+  return children || <Dashboard />;
+};
+
+const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
 
 export default App;

@@ -1,6 +1,7 @@
 import User from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose'
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -41,17 +42,17 @@ const loginUser = async (req, res) => {
 
     try {
         const user = await User.findOne({ email });
-
+        
         if (user && (await user.matchPassword(password))) {
             res.json({
-                _id: user._id,
+                _id: user._id.toString(), // Explicit conversion
                 userName: user.userName,
+                email: user.email,
                 token: generateToken(user._id),
             });
         } else {
-            res.status(401).json({ message: 'Invalid email or password' });
+            res.status(401).json({ message: 'Invalid credentials' });
         }
-
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -100,4 +101,55 @@ const getUserById = async (req, res) => {
     }
 }
 
-export { registerUser, loginUser, getUserProfile, getUserById };
+const getUserForChat = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+            .select('_id userName');
+        res.json(user || {});
+    } catch (error) {
+        res.status(404).json({ message: 'User not found' });
+    }
+};
+
+const getUsers = async (req, res) => {
+    try {
+      // 1. Explicit model reference
+      const User = mongoose.models.User;
+      
+      // 2. Validate request user
+      if (!req.user?._id) {
+        return res.status(401).json({
+          status: 'error',
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required'
+        });
+      }
+  
+      // 3. Fetch users with error logging
+      const users = await User.find({ _id: { $ne: req.user._id } })
+        .select('_id userName email createdAt')
+        .lean();
+  
+      console.log('Fetched users count:', users.length); // Debug log
+
+      const formattedUsers = users.map(user => ({
+        id: user._id.toString(),
+        name: user.userName,
+        email: user.email // Rename _id to id
+      }));
+      
+      res.status(200).json({
+        status: 'success',
+        data: formattedUsers
+      });
+  
+    } catch (error) {
+      console.error('Users Controller Error:', error);
+      res.status(500).json({
+        status: 'error',
+        code: 'SERVER_ERROR',
+        message: error.message
+      });
+    }
+  };
+export { registerUser, loginUser, getUserProfile, getUserById, getUserForChat, getUsers };

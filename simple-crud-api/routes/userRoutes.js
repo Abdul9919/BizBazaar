@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser, getUserProfile, getUserById } from '../controllers/userController.js';
+import { registerUser, loginUser, getUserProfile, getUserById, getUsers } from '../controllers/userController.js';
 const router = express.Router();
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -8,6 +8,7 @@ router.post('/register', registerUser);
 
 // Log in an existing user
 router.post('/login', loginUser);
+router.get('/', protect, getUsers);
 
 // Get the current user's profile (protected route)
 router.get('/profile', protect, getUserProfile);

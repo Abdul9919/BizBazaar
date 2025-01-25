@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
 export const AuthContext = createContext();
@@ -6,34 +6,49 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
 
-  // Check if a valid token exists on initial load
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    
-    if (token) {
-      
-      // Fetch user profile with the token to verify if it's valid
-      axios.get(`${process.env.REACT_APP_API_URL}/api/users/me`, { headers: { authorization: `Bearer ${token}` } })
-        .then(response => {
-          setUser(response.data); // Store the user data
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_URL}/api/users/me`,
+            { headers: { authorization: `Bearer ${token}` } }
+          );
+          
+          // Store both user data AND token in state
+          setUser({
+            ...response.data,
+            token // Store token in user state
+          });
           setIsAuthenticated(true);
-        })
-        .catch(error => {
-          localStorage.removeItem('token'); // Remove invalid token
-          setIsAuthenticated(false);
-        });
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, []);
-  
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          localStorage.removeItem('token');
+        }
+      }
+      setLoading(false); // Mark initialization complete
+    };
 
-  const login = (token, userInfo) => {
+    checkAuth();
+  }, []);
+
+  const login = (token, userData) => {
+    if (!userData?._id) {
+        console.error('Invalid user data in login:', userData);
+        return;
+    }
+    
     localStorage.setItem('token', token);
-    setUser(userInfo); // Set the user data (username, email, etc.)
-    setIsAuthenticated(true);
-  };
+    setUser({
+        id: userData._id,
+        userName: userData.userName,
+        email: userData.email,
+        token
+    });
+};
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -41,9 +56,22 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  if (loading) {
+    return <div>Loading authentication...</div>;
+  }
+
   return (
     <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
+};
+
+// Create and export the useAuth hook separately
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
