@@ -6,7 +6,7 @@ let io;
 const initSocket = (server) => {
   const allowedOrigins = [
     ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : []),
-    'http://localhost:3000',
+    process.env.FRONTEND_URL,
     'http://192.168.18.41:3000' // Replace with your local IP
   ];
 
