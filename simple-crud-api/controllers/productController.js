@@ -90,7 +90,7 @@ const createProduct = async (req, res) => {
       quantity: req.body.quantity,
       description: req.body.description,
       image: imagePath,
-      user_id: req.user.id,
+      user_id: req.user._id,
       userName: req.user.userName,
     });
 

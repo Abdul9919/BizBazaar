@@ -20,28 +20,46 @@ const Dashboard = () => {
     const token = localStorage.getItem('token'); // Ensure the token is stored in localStorage
 
     const fetchProducts = async () => {
+        if (!user?.id) return; // Changed to user.id
+
         setLoading(true);
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/products`, {
-                headers: { authorization: `Bearer ${token}` }, // Correct header format
+                headers: { authorization: `Bearer ${token}` }
             });
-            // Filter the products to only show those added by the logged-in user
-            const userProducts = response.data.filter(product => product.user_id._id === user.id);
+
+            const userProducts = response.data.filter(product => {
+                // Convert both IDs to strings for reliable comparison
+                const productUserId = product.user_id?._id || product.user_id;
+                return productUserId?.toString() === user.id.toString();
+            });
+
+            console.log('Filtered products:', userProducts);
             setProducts(userProducts);
         } catch (err) {
-            setError('Failed to fetch products');
+            console.error('Fetch error:', err);
+            setError(err.response?.data?.message || 'Failed to fetch products');
         } finally {
             setLoading(false);
         }
     };
 
+    // Updated useEffect
     useEffect(() => {
-        fetchProducts();
-    }, [token]);
+        if (user?.id && token) { // Changed to user.id
+            fetchProducts();
+        }
+    }, [token, user?.id]);// Proper dependencies
 
     const handleAddProduct = async (e) => {
         e.preventDefault();
         const formData = new FormData();
+        
+        // Add user reference
+        formData.append('user_id', user.id); // REQUIRED FIELD
+        formData.append('userName', user.userName); // Optional but useful
+        
+        // Existing fields
         formData.append('name', newProduct.name);
         formData.append('price', newProduct.price);
         formData.append('description', newProduct.description);
