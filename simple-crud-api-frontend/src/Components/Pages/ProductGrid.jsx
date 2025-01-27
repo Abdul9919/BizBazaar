@@ -1,7 +1,13 @@
 import React from 'react';
 import ChatButton from '../ChatButton';
+import { useNavigate } from 'react-router-dom';
 
 const ProductGrid = ({ products = [], loading, error, username }) => {
+  const navigate = useNavigate();
+  const onProductClick = (id) => {
+    localStorage.setItem('selectedProductId', id);
+    navigate('/productpage')
+  }
   return (
     <div className="container mx-auto px-4 mt-4">
       {username && <h3 className="text-center mb-4 text-lg md:text-xl">Welcome, {username}!</h3>}
@@ -18,7 +24,7 @@ const ProductGrid = ({ products = [], loading, error, username }) => {
             <p className="text-center col-span-full">No products found.</p>
           ) : (
             products.map((product) => (
-              <div key={product._id} className="group relative bg-white border rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <div onClick={() => onProductClick(product._id)} key={product._id} className="group relative bg-white border rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <div className="aspect-square w-full overflow-hidden">
                   <img
                     src={product.image || 'https://via.placeholder.com/150'}

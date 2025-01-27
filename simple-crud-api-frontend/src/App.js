@@ -10,11 +10,13 @@ import { AuthProvider, AuthContext } from './Components/Contexts/AuthContext';
 import { SocketProvider } from './Components/Contexts/socketContext';
 import ChatWindow from './Components/Chat/ChatWindow';
 import UserList from './Components/Chat/UserList';
+import ProductPage from './Components/Pages/ProductPage';
 
 const App = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [clickedProduct, setClickedProduct] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -31,10 +33,16 @@ const App = () => {
 
     fetchProducts();
   }, []);
-
+/*
+  const handleProductClick = () => {
+   const tempProduct = products.filter((product) => product.id === clickedProduct.id);
+    if (tempProduct.id === clickedProduct.id) {
+      console.log('Clicked Product', tempProduct);
+  }*/
   const handleProductsFetched = (newProducts) => {
     setProducts(newProducts);
   };
+
 
   return (
     <AuthProvider>
@@ -61,6 +69,7 @@ const App = () => {
                   </PrivateRoute>
                 }
               />
+              <Route path="/productpage" element={<ProductPage  products={products} />} />
             </Routes>
           </div>
         </Router>
@@ -131,5 +140,6 @@ const useAuth = () => {
   }
   return context;
 };
+
 
 export default App;
