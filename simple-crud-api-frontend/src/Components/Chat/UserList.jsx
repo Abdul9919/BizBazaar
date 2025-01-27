@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../Contexts/AuthContext';
 
 const UserList = ({ onSelectUser }) => {
   const { user } = useAuth();

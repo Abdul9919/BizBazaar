@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { AuthContext } from './AuthContext';
+import { AuthContext } from '../Contexts/AuthContext';
 
 const Dashboard = () => {
     const { user } = React.useContext(AuthContext);

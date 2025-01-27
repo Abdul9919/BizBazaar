@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from './AuthContext';
-import icon from '../Assets/favicon.png';
+import { AuthContext } from '../Contexts/AuthContext';
+import icon from '../../Assets/favicon.png';
 import { FaSearch, FaUser, FaBars, FaTimes } from 'react-icons/fa';
 
 export const Navbar = ({ onProductsFetched }) => {

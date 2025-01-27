@@ -1,4 +1,5 @@
 import React from 'react';
+import ChatButton from '../ChatButton';
 
 const ProductGrid = ({ products = [], loading, error, username }) => {
   return (
@@ -52,6 +53,7 @@ const ProductGrid = ({ products = [], loading, error, username }) => {
           )}
         </div>
       )}
+      <ChatButton/>
     </div>
   );
 };

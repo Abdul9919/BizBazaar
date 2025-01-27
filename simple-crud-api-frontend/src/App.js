@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import axios from 'axios';
-import { Navbar } from './Components/Navbar';
-import ProductGrid from './Components/ProductGrid';
-import Register from './Components/RegisterPage';
-import Login from './Components/LoginPage';
-import Dashboard from './Components/Dashboard';
-import { AuthProvider, AuthContext } from './Components/AuthContext';
-import { SocketProvider } from './Components/socketContext';
-import ChatWindow from './Components/ChatWindow.jsx';
-import UserList from './Components/UserList';
+import { Navbar } from './Components/Navbar/Navbar';
+import ProductGrid from './Components/Pages/ProductGrid';
+import Register from './Components/Pages/RegisterPage';
+import Login from './Components/Pages/LoginPage';
+import Dashboard from './Components/Pages/Dashboard';
+import { AuthProvider, AuthContext } from './Components/Contexts/AuthContext';
+import { SocketProvider } from './Components/Contexts/socketContext';
+import ChatWindow from './Components/Chat/ChatWindow';
+import UserList from './Components/Chat/UserList';
 
 const App = () => {
   const [products, setProducts] = useState([]);

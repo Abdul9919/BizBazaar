@@ -6,6 +6,7 @@ dotenv.config();
 // Import models FIRST
 import './models/userModel.js'; // Force model registration
 import './models/product.model.js';
+import  messageRoutes from './routes/messageRouter.js';
 
 // Connect to MongoDB
 import connectDB from './database/db.js';
@@ -72,6 +73,7 @@ app.use(session({
 // Routes setup AFTER models and DB connection
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/messages', messageRoutes);
 
 app.get('/', (req, res) => {
   res.send('Chat Server Running');

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSocket } from './socketContext';
-import { useAuth } from './AuthContext';
+import { useSocket } from '../Contexts/socketContext';
+import { useAuth } from '../Contexts/AuthContext';
+import axios from 'axios'
 
 const ChatWindow = ({ selectedUser }) => {
   const { user } = useAuth();
@@ -10,15 +11,87 @@ const ChatWindow = ({ selectedUser }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [page, setPage] = useState(1);
+  const limit = 20;
 
   // Debug selectedUser changes
+
+  const token = user?.token; // Define the token variable
+
+
+  useEffect(() => {
+    if (selectedUser?.id) {
+      setPage(1);
+      setMessages([]);
+      fetchChatHistory();
+    }
+  }, [selectedUser?.id]);
+  const fetchChatHistory = useCallback(async () => {
+    if (!selectedUser?.id || !user?.id || !hasMoreMessages) return;
+
+    try {
+      setIsLoadingHistory(true);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/messages`,
+        {
+          params: {
+            userId: selectedUser.id,
+            page,
+            limit: 20
+          },
+          headers: { authorization: `Bearer ${token}` }
+        }
+      );
+
+      setMessages(prev => {
+        // Filter out duplicates
+        const newMessages = response.data.messages.filter(
+          newMsg => !prev.some(existingMsg => existingMsg._id === newMsg._id)
+        );
+        return [...newMessages, ...prev]; // Prepend older messages
+      });
+
+      setHasMoreMessages(response.data.messages.length === 20);
+    } catch (error) {
+      console.error('History error:', error);
+      setError(error.response?.data?.error || 'Failed to load history');
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, [selectedUser?.id, user?.id, token, page, hasMoreMessages]);
+
+  const handleScroll = useCallback(() => {
+    const container = document.querySelector('.overflow-y-auto');
+    if (!container || isLoadingHistory || !hasMoreMessages) return;
+
+    // Load more when scrolled near top
+    if (container.scrollTop < 100) {
+      setPage(prev => prev + 1);
+    }
+  }, [isLoadingHistory, hasMoreMessages]);
+
+  // Add scroll listener
+  useEffect(() => {
+    const container = document.querySelector('.overflow-y-auto');
+    if (!container) return;
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   useEffect(() => {
     const container = document.querySelector('.overflow-y-auto');
     if (container) {
-      container.scrollTop = container.scrollHeight;
+      // Smooth scroll to bottom
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [messages]);
+
 
   useEffect(() => {
     console.log('SelectedUser details:', {
@@ -111,7 +184,11 @@ const ChatWindow = ({ selectedUser }) => {
     if (!socket) return;
 
     const messageHandler = (message) => {
-      setMessages(prev => [message, ...prev]);
+      const parsedMessage = {
+        ...message,
+        timestamp: new Date(message.timestamp)
+      };
+
     };
 
     socket.on('receiveMessage', messageHandler);
@@ -119,30 +196,22 @@ const ChatWindow = ({ selectedUser }) => {
   }, [socket]);
 
   // Connection error handling
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleConnectError = (err) => {
-      console.error('Connection error:', err.message);
-      setError('Connection lost - reconnecting...');
-    };
-
-    socket.on('connect_error', handleConnectError);
-    return () => socket.off('connect_error', handleConnectError);
-  }, [socket]);
 
   // Socket error handling
   useEffect(() => {
     if (!socket) return;
 
-    const handleError = (error) => {
-      console.error('Socket error:', error);
-      setError('Connection error');
+    const messageHandler = (message) => {
+      setMessages(prev => {
+        const exists = prev.some(m => m._id === message._id);
+        return exists ? prev : [...prev, message];
+      });
     };
 
-    socket.on('error', handleError);
-    return () => socket.off('error', handleError);
+    socket.on('receiveMessage', messageHandler);
+    return () => socket.off('receiveMessage', messageHandler);
   }, [socket]);
+
 
   // Typing indicator
   useEffect(() => {
@@ -204,35 +273,62 @@ const ChatWindow = ({ selectedUser }) => {
 
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {isLoadingHistory && (
+          <div className="text-center text-gray-500 p-4">
+            <div className="animate-pulse">
+              Loading older messages...
+            </div>
+          </div>
+        )}
+
         {messages
-          .slice()
-          .sort((a, b) => a.timestamp - b.timestamp) // Newest first
+          .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
           .map((msg) => (
             <div
               key={msg._id}
               className={`flex ${msg.sender === user.id ? 'justify-end' : 'justify-start'}`}
             >
-              {/* ... rest of your message bubble code ... */}
-              <div
-                  className={`max-w-xs p-3 rounded-lg relative ${msg.sender === user.id
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white border'
-                    } ${msg.status === 'sending' ? 'opacity-75' : ''}`}
-                >
-                  <p>{msg.content}</p>
-                  <p className={`text-xs mt-1 ${msg.sender === user.id ? 'text-blue-100' : 'text-gray-500'
-                    }`}>
-                    {new Date(msg.timestamp).toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true
-                    })}
-                    {msg.status === 'sending' && ' · Sending...'}
-                  </p>
-                </div>
+              <div className={`max-w-xs p-3 rounded-lg relative ${msg.sender === user.id
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white border'
+                } ${msg.status === 'sending' ? 'opacity-75' : ''}`}>
+                <p>{msg.content}</p>
+                <p className={`text-xs mt-1 ${msg.sender === user.id
+                    ? 'text-blue-100'
+                    : 'text-gray-500'
+                  }`}>
+                  {new Date(msg.timestamp).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
+                  {msg.status === 'sending' && ' · Sending...'}
+                </p>
+              </div>
             </div>
           ))}
+
+        {!hasMoreMessages && messages.length > 0 && (
+          <div className="text-center text-gray-500 p-4 border-t">
+            No older messages available
+          </div>
+        )}
       </div>
+
+      {isLoadingHistory && (
+        <div className="text-center p-4 text-gray-500">
+          <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full"
+            role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      )}
+
+      {messages.length === 0 && !isLoadingHistory && (
+        <div className="text-center p-4 text-gray-500">
+          Start the conversation! No messages yet.
+        </div>
+      )}
 
       {/* Message Input */}
       <form onSubmit={sendMessage} className="p-4 border-t bg-white">
