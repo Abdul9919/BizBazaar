@@ -18,6 +18,7 @@ import path from 'path';
 import http from 'http';
 import productRoutes from './routes/product.routes.js';
 import userRoutes from './routes/userRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
 import { initSocket } from './webSocket/socket.js';
 
 const __dirname = path.dirname(decodeURIComponent(new URL(import.meta.url).pathname).substring(1));
@@ -74,6 +75,7 @@ app.use(session({
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/cart', cartRoutes);
 
 app.get('/', (req, res) => {
   res.send('Chat Server Running');
