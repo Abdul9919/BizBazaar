@@ -1,15 +1,27 @@
-import React, { useEffect, useState } from 'react'
+
+import React, { useContext, useEffect, useState } from 'react'
+import { AuthContext } from '../Contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const ProductPage = ({ products }) => {
   const [product, setProduct] = useState({});
-  
+  const navigate = useNavigate()
+
+  const { user, isAuthenticated } = useContext(AuthContext)
+
+  const navigateTo = () => {
+    navigate('/chat')
+  }
+
   useEffect(() => {
     const matchProduct = () => {
       const selectedProductId = localStorage.getItem('selectedProductId');
       const matchedProduct = products.find(product => product.id === selectedProductId);
-      
+
       if (matchedProduct) {
         setProduct(matchedProduct);
+        console.log('sellerid', product.user_id);
+        localStorage.setItem('sellerId', matchedProduct.user_id._id);
       } else {
         console.log('No product matched the selected ID.');
       }
@@ -18,17 +30,24 @@ const ProductPage = ({ products }) => {
     matchProduct();
   }, [products]); // Added products to dependency array
 
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-8 bg-white rounded-lg shadow-lg p-6">
           {/* Product Image Section */}
           <div className="w-full md:w-1/2">
-            <img 
-              src={product?.image} 
-              alt={product?.name} 
+            <img
+              src={product?.image}
+              alt={product?.name}
               className="w-full h-96 object-contain rounded-lg"
             />
+            <div className='my-6 ml-10'>
+              <h3 className="text-xl text-gray-800 font-bold font-serif my-4">Product Description:</h3>
+              <p className="text-gray-900 text-lg font-[Arial]">
+                {product?.description}
+              </p>
+            </div>
           </div>
 
           {/* Product Details Section */}
@@ -45,6 +64,12 @@ const ProductPage = ({ products }) => {
                 {product?.user_id?.userName}
               </span>
             </div>
+            {isAuthenticated ? (product?.user_id?._id === user.id ? null : (
+              <button onClick={navigateTo} className="max-w-[25%] text-blue-500 hover:underline hover:text-blue-700 transition duration-200">
+                Message Seller
+              </button>
+            )) : (<p className="text-red-500">Please login to message the seller</p>)}
+
 
             {/* Price */}
             <div className="mt-4">
@@ -60,6 +85,17 @@ const ProductPage = ({ products }) => {
               <p className="text-xl text-gray-900 font-semibold">
                 {product?.quantity}
               </p>
+            </div>
+            <div className="flex space-x-4">
+              {/* Add to Cart Button */}
+              <button className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition duration-300">
+                Add to Cart
+              </button>
+
+              {/* Buy Now Button */}
+              <button className="bg-orange-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-orange-600 transition duration-300">
+                Buy Now
+              </button>
             </div>
           </div>
         </div>

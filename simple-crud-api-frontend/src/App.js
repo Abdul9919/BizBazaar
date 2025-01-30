@@ -33,12 +33,12 @@ const App = () => {
 
     fetchProducts();
   }, []);
-/*
-  const handleProductClick = () => {
-   const tempProduct = products.filter((product) => product.id === clickedProduct.id);
-    if (tempProduct.id === clickedProduct.id) {
-      console.log('Clicked Product', tempProduct);
-  }*/
+  /*
+    const handleProductClick = () => {
+     const tempProduct = products.filter((product) => product.id === clickedProduct.id);
+      if (tempProduct.id === clickedProduct.id) {
+        console.log('Clicked Product', tempProduct);
+    }*/
   const handleProductsFetched = (newProducts) => {
     setProducts(newProducts);
   };
@@ -69,7 +69,7 @@ const App = () => {
                   </PrivateRoute>
                 }
               />
-              <Route path="/productpage" element={<ProductPage  products={products} />} />
+              <Route path="/productpage" element={<ProductPage products={products} />} />
             </Routes>
           </div>
         </Router>
@@ -80,6 +80,7 @@ const App = () => {
 
 const ChatInterface = () => {
   const [selectedUser, setSelectedUser] = useState(null);
+  const [sellerId, setSellerId] = useState(null);
 
   // Debug selected user changes
   useEffect(() => {
@@ -89,11 +90,26 @@ const ChatInterface = () => {
     });
   }, [selectedUser]);
 
+  const fetchSellerId = async () => {
+    try {
+      const sellerId = localStorage.getItem('sellerId');
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/profile/${sellerId}`);
+      setSellerId(response.data);
+    } catch (error) {
+      console.log('Error fetching seller id:', error.message); 
+    }
+  }
+
+  useEffect(() => {
+    fetchSellerId();
+  }, [])
+
+
   return (
     <div className="flex h-screen">
       {/* User List Sidebar */}
       <div className="w-1/4 border-r bg-white">
-        <UserList 
+        <UserList
           onSelectUser={(user) => {
             console.log('User selected:', user);
             setSelectedUser({
@@ -107,13 +123,9 @@ const ChatInterface = () => {
 
       {/* Chat Window */}
       <div className="flex-1 bg-gray-50">
-        {selectedUser?.id ? (
-          <ChatWindow key={selectedUser._id} selectedUser={selectedUser} />
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500 text-lg">
-            Select a user from the sidebar to start chatting
-          </div>
-        )}
+
+          <ChatWindow key={sellerId?._id} selectedUser={sellerId} />
+
       </div>
     </div>
   );

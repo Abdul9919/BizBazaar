@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../Contexts/AuthContext';
 import icon from '../../Assets/favicon.png';
-import { FaSearch, FaUser, FaBars, FaTimes } from 'react-icons/fa';
+import { FaSearch, FaUser, FaBars, FaTimes, FaShoppingCart } from 'react-icons/fa';
 
 export const Navbar = ({ onProductsFetched }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,7 +56,7 @@ export const Navbar = ({ onProductsFetched }) => {
   };
 
   return (
-    <nav className="rounded-lg flex flex-wrap items-center justify-between bg-gradient-to-tr from-slate-950 to-slate-500 px-4 py-3 md:px-6 md:py-4">
+    <nav className="rounded-lg flex flex-wrap items-center gap-4 bg-gradient-to-tr from-slate-950 to-slate-500 px-4 py-3 md:px-6 md:py-4">
       {/* Left Section */}
       <div className="flex items-center justify-between w-full md:w-auto">
         <div className="flex items-center space-x-4 md:space-x-6">
@@ -102,15 +102,7 @@ export const Navbar = ({ onProductsFetched }) => {
                 <span className="relative z-10">About</span>
               </Link>
             </li>
-            <li>
-              <Link 
-                to="/services"
-                className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200 block md:inline-block w-full md:w-auto"
-              >
-                <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
-                <span className="relative z-10">Services</span>
-              </Link>
-            </li>
+
             <li>
               <Link 
                 to="/contact"
@@ -165,6 +157,10 @@ export const Navbar = ({ onProductsFetched }) => {
                 >
                   Dashboard
                 </button>
+
+                <FaShoppingCart size={24} color="black" />
+                My Cart
+
               </>
             ) : (
               <>
@@ -231,9 +227,13 @@ export const Navbar = ({ onProductsFetched }) => {
               <FaUser className="text-white text-sm" />
               <span>Dashboard</span>
             </button>
+            <button className='flex items-center space-x-2 text-white gap-2 text-md font-semibold  hover:scale-110 transition-transform duration-300'>
+            <FaShoppingCart size={30} color="white" />
+            My Cart
+            </button>
           </div>
         ) : (
-          <div className="flex items-center space-x-4">
+          <div className="flex items-right space-x-4" style={{ marginLeft: '15rem' }}>
             <button
               className="relative text-white transition-all text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-stone-950"
               type="button"
