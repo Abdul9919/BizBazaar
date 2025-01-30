@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import { useAuth } from '../Contexts/AuthContext';
+import { AuthContext} from '../Contexts/AuthContext';
 
 const UserList = ({ onSelectUser }) => {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchChatUsers = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/users`,
+          `${process.env.REACT_APP_API_URL}/api/messages/chat-history`, // New API endpoint
           {
             headers: {
               authorization: `Bearer ${user?.token}`
@@ -20,7 +20,6 @@ const UserList = ({ onSelectUser }) => {
           }
         );
 
-        // Handle empty response
         if (!response.data?.data) {
           throw new Error('Invalid server response');
         }
@@ -37,7 +36,7 @@ const UserList = ({ onSelectUser }) => {
     };
 
     if (user?.token) {
-      fetchUsers();
+      fetchChatUsers();
     } else {
       setError('Authentication required');
       setLoading(false);
@@ -47,22 +46,23 @@ const UserList = ({ onSelectUser }) => {
   if (error) return <div className="p-4 text-red-500">{error}</div>;
   if (loading) return <div className="p-4 text-gray-500">Loading users...</div>;
 
+
   return (
     <div className="user-list">
       {users.map(user => (
         <div
-        key={user.id}
-        className="user-item p-3 hover:bg-gray-50 cursor-pointer border-b"
-        onClick={() => onSelectUser({
-          id: user.id,    // Ensure this matches the API response
-          name: user.name,
-          email: user.email
-        })}
-      >
+          key={user._id}  // MongoDB uses _id, not id
+          className="user-item p-3 hover:bg-gray-50 cursor-pointer border-b"
+          onClick={() => onSelectUser({
+            id: user._id,   
+            name: user.userName,
+            email: user.email
+          })}
+        >
           <div className="flex items-center">
             <div className="avatar mr-3">👤</div>
             <div>
-              <p className="font-medium">{user.name}</p>
+              <p className="font-medium">{user.userName}</p>
               <p className="text-sm text-gray-500">{user.email}</p>
             </div>
           </div>
@@ -72,4 +72,4 @@ const UserList = ({ onSelectUser }) => {
   );
 };
 
-export default UserList
+export default UserList;

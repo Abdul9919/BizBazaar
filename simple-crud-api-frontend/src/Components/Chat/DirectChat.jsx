@@ -15,6 +15,7 @@ const ChatWindow = ({ selectedUser }) => {
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [page, setPage] = useState(1);
   const limit = 20;
+  console.log('selected user:',selectedUser)
 
   // Debug selectedUser changes
 
@@ -22,14 +23,14 @@ const ChatWindow = ({ selectedUser }) => {
 
 
   useEffect(() => {
-    if (selectedUser?.id) {
+    if (selectedUser?._id) {
       setPage(1);
       setMessages([]);
       fetchChatHistory();
     }
-  }, [selectedUser?.id]);
+  }, [selectedUser?._id]);
   const fetchChatHistory = useCallback(async () => {
-    if (!selectedUser?.id || !user?.id || !hasMoreMessages) return;
+    if (!selectedUser?._id || !user?.id || !hasMoreMessages) return;
 
     try {
       setIsLoadingHistory(true);
@@ -37,7 +38,7 @@ const ChatWindow = ({ selectedUser }) => {
         `${process.env.REACT_APP_API_URL}/api/messages`,
         {
           params: {
-            userId: selectedUser.id,
+            userId: selectedUser._id,
             page,
             limit: 20
           },
@@ -60,7 +61,7 @@ const ChatWindow = ({ selectedUser }) => {
     } finally {
       setIsLoadingHistory(false);
     }
-  }, [selectedUser?.id, user?.id, token, page, hasMoreMessages]);
+  }, [selectedUser?._id, user?.id, token, page, hasMoreMessages]);
 
   const handleScroll = useCallback(() => {
     const container = document.querySelector('.overflow-y-auto');
@@ -99,7 +100,7 @@ const ChatWindow = ({ selectedUser }) => {
     e.preventDefault();
 
     // Validate input conditions
-    if (!messageInput.trim() || !selectedUser?.id || !socket || isSending) {
+    if (!messageInput.trim() || !selectedUser?._id || !socket || isSending) {
       console.log('Blocked send attempt. Reasons:', {
         hasInput: !!messageInput.trim(),
         validUser: !!selectedUser?.id,
@@ -110,8 +111,8 @@ const ChatWindow = ({ selectedUser }) => {
     }
 
     // Validate user ID format
-    if (!/^[0-9a-fA-F]{24}$/.test(selectedUser?.id)) {
-      console.error('Invalid MongoDB ID:', selectedUser?.id);
+    if (!/^[0-9a-fA-F]{24}$/.test(selectedUser?._id)) {
+      console.error('Invalid MongoDB ID:', selectedUser?._id);
       setError('Invalid recipient ID');
       return;
     }
@@ -120,7 +121,7 @@ const ChatWindow = ({ selectedUser }) => {
     const tempMessage = {
       _id: tempId,
       sender: user.id,
-      receiver: selectedUser.id,
+      receiver: selectedUser._id,
       content: messageInput.trim(),
       timestamp: new Date(),
       status: 'sending'
@@ -137,7 +138,7 @@ const ChatWindow = ({ selectedUser }) => {
 
       socket.emit('sendMessage',
         {
-          receiverId: selectedUser.id,
+          receiverId: selectedUser._id,
           content: messageInput.trim()
         },
         (response) => {
@@ -206,23 +207,23 @@ const ChatWindow = ({ selectedUser }) => {
 
   // Typing indicator
   useEffect(() => {
-    if (!socket || !selectedUser?.id) return;
+    if (!socket || !selectedUser?._id) return;
 
     let timeout;
     const handleTyping = () => {
-      socket.emit('typing', selectedUser?.id);
+      socket.emit('typing', selectedUser?._id);
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        socket.emit('stopTyping', selectedUser?.id);
+        socket.emit('stopTyping', selectedUser?._id);
       }, 1000);
     };
 
     const typingHandler = (userId) => {
-      if (userId === selectedUser?.id) setIsTyping(true);
+      if (userId === selectedUser?._id) setIsTyping(true);
     };
 
     const stopTypingHandler = (userId) => {
-      if (userId === selectedUser?.id) setIsTyping(false);
+      if (userId === selectedUser?._id) setIsTyping(false);
     };
 
     socket.on('typing', typingHandler);
@@ -253,10 +254,10 @@ const ChatWindow = ({ selectedUser }) => {
       <div className="p-4 bg-white border-b">
         <div className="flex items-center">
           <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
-            {selectedUser?.name?.[0] ?? '?'}
+            {selectedUser?.userName?.[0] ?? '?'}
           </div>
           <div className="ml-4">
-            <h2 className="font-semibold">{selectedUser?.name ?? 'Unknown User'}</h2>
+            <h2 className="font-semibold">{selectedUser?.userName ?? 'Unknown User'}</h2>
             {isTyping && <p className="text-sm text-gray-500">typing...</p>}
           </div>
         </div>

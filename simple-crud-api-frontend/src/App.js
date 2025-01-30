@@ -11,6 +11,7 @@ import { SocketProvider } from './Components/Contexts/socketContext';
 import ChatWindow from './Components/Chat/ChatWindow';
 import UserList from './Components/Chat/UserList';
 import ProductPage from './Components/Pages/ProductPage';
+import DirectChat from './Components/Chat/DirectChat';
 
 const App = () => {
   const [products, setProducts] = useState([]);
@@ -69,6 +70,14 @@ const App = () => {
                   </PrivateRoute>
                 }
               />
+              <Route
+                path="/direct-chat"
+                element={
+                  <PrivateRoute>
+                    <DirectChatInterface />
+                  </PrivateRoute>
+                }
+              />
               <Route path="/productpage" element={<ProductPage products={products} />} />
             </Routes>
           </div>
@@ -79,6 +88,45 @@ const App = () => {
 };
 
 const ChatInterface = () => {
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // Debug selected user changes
+  useEffect(() => {
+    console.log('Selected User in ChatInterface:', {
+      id: selectedUser?.id,
+      valid: selectedUser?.id ? /^[0-9a-fA-F]{24}$/.test(selectedUser.id) : false
+    });
+  }, [selectedUser]);
+
+
+
+  return (
+    <div className="flex h-screen">
+      {/* User List Sidebar */}
+      <div className="w-1/4 border-r bg-white">
+        <UserList
+          onSelectUser={(user) => {
+            console.log('User selected:', user);
+            setSelectedUser({
+              id: user.id,
+              name: user.name,
+              email: user.email
+            });
+          }}
+        />
+      </div>
+
+      {/* Chat Window */}
+      <div className="flex-1 bg-gray-50">
+
+          <ChatWindow key={selectedUser?.id} selectedUser={selectedUser} />
+
+      </div>
+    </div>
+  );
+};
+
+const DirectChatInterface = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [sellerId, setSellerId] = useState(null);
 
@@ -124,7 +172,7 @@ const ChatInterface = () => {
       {/* Chat Window */}
       <div className="flex-1 bg-gray-50">
 
-          <ChatWindow key={sellerId?._id} selectedUser={sellerId} />
+          <DirectChat key={sellerId?._id} selectedUser={sellerId} />
 
       </div>
     </div>

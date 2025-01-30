@@ -10,7 +10,7 @@ const ProductPage = ({ products }) => {
   const { user, isAuthenticated } = useContext(AuthContext)
 
   const navigateTo = () => {
-    navigate('/chat')
+    navigate('/direct-chat')
   }
 
   useEffect(() => {
