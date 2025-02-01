@@ -12,6 +12,7 @@ import ChatWindow from './Components/Chat/ChatWindow';
 import UserList from './Components/Chat/UserList';
 import ProductPage from './Components/Pages/ProductPage';
 import DirectChat from './Components/Chat/DirectChat';
+import Cart from './Components/Pages/Cart.jsx';
 
 const App = () => {
   const [products, setProducts] = useState([]);
@@ -52,6 +53,7 @@ const App = () => {
           <div className="app-container">
             <Navbar onProductsFetched={handleProductsFetched} />
             <Routes>
+            <Route path='/my-cart' element={<Cart/>}/>
               <Route
                 path="/"
                 element={<ProductGridWrapper products={products} loading={loading} error={error} />}
@@ -79,6 +81,7 @@ const App = () => {
                 }
               />
               <Route path="/productpage" element={<ProductPage products={products} />} />
+              
             </Routes>
           </div>
         </Router>
@@ -118,8 +121,14 @@ const ChatInterface = () => {
 
       {/* Chat Window */}
       <div className="flex-1 bg-gray-50">
-
+        {selectedUser?.id ? (
           <ChatWindow key={selectedUser?.id} selectedUser={selectedUser} />
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-500 text-lg">
+            Select a user from the sidebar to start chatting
+          </div>
+        )}
+
 
       </div>
     </div>
@@ -144,7 +153,7 @@ const DirectChatInterface = () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/profile/${sellerId}`);
       setSellerId(response.data);
     } catch (error) {
-      console.log('Error fetching seller id:', error.message); 
+      console.log('Error fetching seller id:', error.message);
     }
   }
 
@@ -172,7 +181,7 @@ const DirectChatInterface = () => {
       {/* Chat Window */}
       <div className="flex-1 bg-gray-50">
 
-          <DirectChat key={sellerId?._id} selectedUser={sellerId} />
+        <DirectChat key={sellerId?._id} selectedUser={sellerId} />
 
       </div>
     </div>

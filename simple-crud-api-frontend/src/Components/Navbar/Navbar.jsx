@@ -70,7 +70,7 @@ export const Navbar = ({ onProductsFetched }) => {
 
         {/* Hamburger Icon - Mobile Only */}
         <div className="md:hidden">
-          <button 
+          <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="text-white hover:text-gray-300 focus:outline-none"
           >
@@ -85,8 +85,8 @@ export const Navbar = ({ onProductsFetched }) => {
           {/* Navigation Links */}
           <ul className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-4">
             <li>
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200 block md:inline-block w-full md:w-auto"
               >
                 <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
@@ -94,7 +94,7 @@ export const Navbar = ({ onProductsFetched }) => {
               </Link>
             </li>
             <li>
-              <Link 
+              <Link
                 to="/about"
                 className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200 block md:inline-block w-full md:w-auto"
               >
@@ -104,7 +104,7 @@ export const Navbar = ({ onProductsFetched }) => {
             </li>
 
             <li>
-              <Link 
+              <Link
                 to="/contact"
                 className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-200 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200 block md:inline-block w-full md:w-auto"
               >
@@ -157,9 +157,14 @@ export const Navbar = ({ onProductsFetched }) => {
                 >
                   Dashboard
                 </button>
+                <button
+                  onClick={() => navigate('/my-cart')}
+                  className="text-white flex items-center gap-2 w-full justify-center py-2 hover:bg-slate-700 rounded-lg"
+                >
+                  <FaShoppingCart size={24} color="white" />
+                  <span>My Cart</span>
+                </button>
 
-                <FaShoppingCart size={24} color="black" />
-                My Cart
 
               </>
             ) : (
@@ -227,9 +232,12 @@ export const Navbar = ({ onProductsFetched }) => {
               <FaUser className="text-white text-sm" />
               <span>Dashboard</span>
             </button>
-            <button className='flex items-center space-x-2 text-white gap-2 text-md font-semibold  hover:scale-110 transition-transform duration-300'>
-            <FaShoppingCart size={30} color="white" />
-            My Cart
+            <button
+              onClick={() => navigate('/my-cart')}
+              className='flex items-center space-x-2 text-white gap-2 text-md font-semibold hover:scale-110 transition-transform duration-300'
+            >
+              <FaShoppingCart size={30} color="white" />
+              My Cart
             </button>
           </div>
         ) : (
