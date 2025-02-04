@@ -5,10 +5,12 @@
   "proxy": "https://bizbazaar-production.up.railway.app",
   "dependencies": {
     "@adminjs/design-system": "^4.1.1",
+    "@stripe/stripe-js": "^5.6.0",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "cra-template": "1.2.0",
+    "lucide-react": "^0.474.0",
     "postcss": "^8.4.49",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -20,7 +22,7 @@
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts start --host 0.0.0.0",
     "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

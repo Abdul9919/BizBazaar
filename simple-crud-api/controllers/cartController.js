@@ -35,9 +35,9 @@ const addItemToCart = async (req, res) => {
         }
 
         // Check for existing cart item
-        const existingCartItem = await Cart.findOne({ 
-            user: user._id, 
-            product: product 
+        const existingCartItem = await Cart.findOne({
+            user: user._id,
+            product: product
         });
 
         if (existingCartItem) {
@@ -45,7 +45,7 @@ const addItemToCart = async (req, res) => {
             existingCartItem.quantity += quantity;
             existingCartItem.totalPrice = matchedProduct.price * existingCartItem.quantity;
             await existingCartItem.save();
-            
+
             return res.status(200).json({
                 success: true,
                 message: "Cart item quantity updated",
@@ -107,16 +107,24 @@ const updateCartItem = async (req, res) => {
             return res.status(404).json({ message: "Cart item not found" });
         }
 
-        // Update quantity and total price
-        cartItem.quantity = quantity;
-        cartItem.totalPrice = cartItem.product.price * quantity;
-        await cartItem.save();
+        if (quantity <= cartItem.product.quantity) {
+            cartItem.quantity = quantity;
+            cartItem.totalPrice = cartItem.product.price * quantity;
+            await cartItem.save();
 
-        res.status(200).json({
-            success: true,
-            message: "Cart item updated successfully",
-            cartItem,
-        });
+            return res.status(200).json({
+                success: true,
+                message: "Cart item updated successfully",
+                cartItem,
+            });
+        }
+        else {
+            return res.status(400).json({
+                message: 'Cannot increase more quantity'
+            })
+        }
+
+
 
     } catch (error) {
         res.status(500).json({ message: error.message });

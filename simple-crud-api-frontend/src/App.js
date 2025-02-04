@@ -13,6 +13,8 @@ import UserList from './Components/Chat/UserList';
 import ProductPage from './Components/Pages/ProductPage';
 import DirectChat from './Components/Chat/DirectChat';
 import Cart from './Components/Pages/Cart.jsx';
+import Success from './Components/Pages/Success.jsx';
+import Cancel from './Components/Pages/Cancel.jsx';
 
 const App = () => {
   const [products, setProducts] = useState([]);
@@ -81,7 +83,8 @@ const App = () => {
                 }
               />
               <Route path="/productpage" element={<ProductPage products={products} />} />
-              
+              <Route path='/success' element={<Success/>}/>
+              <Route path='/cancel' element={<Cancel/>}/>
             </Routes>
           </div>
         </Router>

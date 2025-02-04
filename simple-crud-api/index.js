@@ -19,6 +19,7 @@ import http from 'http';
 import productRoutes from './routes/product.routes.js';
 import userRoutes from './routes/userRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js'
 import { initSocket } from './webSocket/socket.js';
 
 const __dirname = path.dirname(decodeURIComponent(new URL(import.meta.url).pathname).substring(1));
@@ -76,12 +77,13 @@ app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/payment', paymentRoutes)
 
 app.get('/', (req, res) => {
   res.send('Chat Server Running');
 });
 
-server.listen(port, () => {
+server.listen(port,'0.0.0.0', () => {
   console.log(`Server running at http://localhost:${port}`);
   console.log('Allowed origins:', allowedOrigins);
 });
