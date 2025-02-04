@@ -29,8 +29,6 @@ const app = express();
 const server = http.createServer(app);
 
 const allowedOrigins = [
-  ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : []),
-  process.env.FRONTEND_URL,
   'http://192.168.18.41:3000'
 ];
 
