@@ -64,7 +64,7 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    const tempTotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+    const tempTotal = cartItems.reduce((acc, item) => acc + item?.product?.price * item?.quantity, 0);
     setTotal(tempTotal);
   }, [cartItems]);
 
@@ -91,24 +91,24 @@ const Cart = () => {
           {cartItems.map(item => (
             <div key={item._id} className="flex items-center border-b border-gray-200 py-4">
               <img
-                src={item.product.image}
-                alt={item.product.name}
+                src={item?.product?.image}
+                alt={item?.product?.name}
                 className="w-20 h-20 object-cover rounded mr-4"
               />
               <div className="flex-1">
-                <h2 className="text-lg font-semibold">{item.product.name}</h2>
-                <p className="text-gray-600">${!isNaN(item.product.price) ? item.product.price.toFixed(2) : '0.00'}</p>
+                <h2 className="text-lg font-semibold">{item?.product?.name}</h2>
+                <p className="text-gray-600">${!isNaN(item?.product?.price) ? item?.product?.price.toFixed(2) : '0.00'}</p>
               </div>
               <div className="flex items-center">
                 <button
-                  onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
+                  onClick={() => handleQuantityChange(item?._id, item?.quantity - 1)}
                   className="px-3 py-1 bg-gray-800 rounded-l text-white hover:bg-gray-300"
                 >
                   -
                 </button>
-                <span className="px-4 py-1 bg-gray-100">{item.quantity}</span>
+                <span className="px-4 py-1 bg-gray-100">{item?.quantity}</span>
                 <button
-                  onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
+                  onClick={() => handleQuantityChange(item?._id, item?.quantity + 1)}
                   className="px-3 py-1 bg-gray-800 rounded-r text-white hover:bg-gray-300"
                 >
                   +
@@ -116,11 +116,11 @@ const Cart = () => {
               </div>
               <div className="ml-4">
                 <p className="text-lg font-semibold">
-                  ${(item.totalPrice).toFixed(2)}
+                  ${(item?.totalPrice).toFixed(2)}
                 </p>
               </div>
               <button
-                onClick={() => handleRemoveItem(item._id)}
+                onClick={() => handleRemoveItem(item?._id)}
                 className="ml-6 text-red-500 hover:text-red-700"
               >
                 Remove
