@@ -83,7 +83,8 @@ const Cart = () => {
 
   return (
     <>
-      <div className="container absolute left-0 w-1/2 border-r-[1px] border-slate-400 border-b rounded-lg pl-0 p-4 my-[2rem]">
+      <div className="container absolute left-0 w-1/2 border-r-[1px] bg-gray-200 border-slate-400 border-b rounded-lg pl-0 p-4 my-[2rem] shadow-lg">
+
         <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
 
         <>
@@ -101,14 +102,14 @@ const Cart = () => {
               <div className="flex items-center">
                 <button
                   onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
-                  className="px-3 py-1 bg-gray-200 rounded-l hover:bg-gray-300"
+                  className="px-3 py-1 bg-gray-800 rounded-l text-white hover:bg-gray-300"
                 >
                   -
                 </button>
                 <span className="px-4 py-1 bg-gray-100">{item.quantity}</span>
                 <button
                   onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
-                  className="px-3 py-1 bg-gray-200 rounded-r hover:bg-gray-300"
+                  className="px-3 py-1 bg-gray-800 rounded-r text-white hover:bg-gray-300"
                 >
                   +
                 </button>

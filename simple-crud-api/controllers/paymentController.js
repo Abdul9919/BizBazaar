@@ -28,6 +28,7 @@ const createStripeSession = async (req, res) => {
         })
 
         res.json({ id: session.id })
+
     } catch (error) {
         console.error("Stripe Error:", error);
         res.status(500).json({ error: error.message });

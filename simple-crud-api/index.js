@@ -29,7 +29,7 @@ const app = express();
 const server = http.createServer(app);
 
 const allowedOrigins = [
-  'http://192.168.18.41:3000'
+  process.env.FRONTEND_URL
 ];
 
 app.use(cors({
