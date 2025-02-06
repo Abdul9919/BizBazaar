@@ -160,12 +160,13 @@ const updateProductByName = async (req, res) => {
 const deleteProductById = async (req, res) => {
   try {
     const { id } = req.params;
+    const {user} = req.body;
 
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    if (product.user_id.toString() !== req.user.id) {
+    if (product.user_id.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Unauthorized action' });
     }
 
