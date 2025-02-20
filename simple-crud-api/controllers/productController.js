@@ -1,37 +1,31 @@
 import Product from '../models/product.model.js';
-import path from 'path';
+import cloudinary from '../config/cloudinary.js';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Directory to save the images
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueName);
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'products', // Folder in Cloudinary
+    format: async (req, file) => 'png', // Convert to PNG
+    public_id: (req, file) => `${Date.now()}-${file.originalname}`,
   },
 });
+
 const upload = multer({ storage });
 
 // Get all products or search products
 const getProducts = async (req, res) => {
   try {
-    // If the user is authenticated, filter products by user_id
-    const filter = req.user ? { user_id: req.user.id } : {};  // If no user, no filter applied
-
+    const filter = req.user ? { user_id: req.user.id } : {};
     const { search } = req.query;
     
-    // If a search query is provided, filter products by name
     if (search) {
-      filter.name = { $regex: search, $options: 'i' }; // Case-insensitive search
+      filter.name = { $regex: search, $options: 'i' };
     }
 
-    // Fetch products based on the filter criteria
-    const allProducts = await Product.find(filter)
-      .populate('user_id', 'userName')
-      .exec();
-
-    res.status(200).json(allProducts); // Return the fetched products
+    const allProducts = await Product.find(filter).populate('user_id', 'userName').exec();
+    res.status(200).json(allProducts);
   } catch (error) {
     console.error('Error fetching products:', error.message);
     res.status(500).json({ message: error.message });
@@ -82,30 +76,31 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ message: 'Image file is required' });
     }
 
-    const imagePath = `${process.env.SERVER_URL}/uploads/${req.file.filename}`;
+    // Upload image to Cloudinary
+    const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'products',
+    });
 
     const newProduct = await Product.create({
       name: req.body.name,
       price: req.body.price,
       quantity: req.body.quantity,
       description: req.body.description,
-      image: imagePath,
+      image: uploadedImage.secure_url, // Cloudinary image URL
       user_id: req.user._id,
       userName: req.user.userName,
     });
 
     res.status(201).json({
       message: 'Product created successfully',
-      product: {
-        ...newProduct.toObject(),
-        image: `${req.protocol}://${req.get('host')}${imagePath}`,
-      },
+      product: newProduct,
     });
   } catch (error) {
     console.error('Error creating product:', error.message);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Update a product by ID
 const updateProductById = async (req, res) => {

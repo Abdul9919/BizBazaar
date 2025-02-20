@@ -192,7 +192,7 @@ export const Navbar = ({ onProductsFetched }) => {
       </div>
 
       {/* Desktop Right Section */}
-      <div className="hidden md:flex items-center space-x-6">
+      <div className="hidden lg:flex items-center space-x-6">
         <form className="flex items-center space-x-2" onSubmit={handleSearch}>
           <FaSearch className="text-slate-300 text-lg" />
           <input

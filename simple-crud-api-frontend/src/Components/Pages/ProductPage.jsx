@@ -58,13 +58,13 @@ const ProductPage = ({ products }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row gap-8 bg-white rounded-lg shadow-lg p-6">
+        <div className="flex flex-col md:flex-row md:pt-0 md:px-6 md:pb-6 gap-8 bg-white rounded-lg shadow-lg p-6">
           {/* Product Image Section */}
           <div className="w-full md:w-1/2">
             <img
               src={currentProduct?.image}
               alt={currentProduct?.name}
-              className="w-full h-96 object-contain rounded-lg"
+              className="w-full h-96 md:h-42 object-contain rounded-lg"
             />
             <div className='my-6 ml-10'>
               <h3 className="text-xl text-gray-800 font-bold font-serif my-4">Product Description:</h3>

@@ -17,19 +17,20 @@ const ProductGrid = ({ products = [], loading, error, username }) => {
       {error && <p className="text-center text-red-500 md:text-lg">{error}</p>}
 
       {!loading && !error && (
-        <div className="mt-6 grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6">
+        <div className="mt-6 grid grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6">
+
           {!Array.isArray(products) ? (
             <p className="text-center col-span-full">Invalid products data received.</p>
           ) : products.length === 0 ? (
             <p className="text-center col-span-full">No products found.</p>
           ) : (
             products.map((product) => (
-              <div onClick={() => onProductClick(product._id)} key={product._id} className="group relative bg-white border rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <div className="aspect-square w-full overflow-hidden">
+              <div onClick={() => onProductClick(product._id)} key={product._id} className="group relative bg-white border rounded-lg shadow-md overflow-hidden hover:shadow-lg lg:max-w-[250px] transition-shadow duration-300">
+                <div className="aspect-square lg:w-[250px] md:w-full sm:w-full overflow-hidden">
                   <img
                     src={product.image || 'https://via.placeholder.com/150'}
                     alt={product.name}
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+                    className="lg:w-[250px] lg:h-[250px] sm:w-full sm:h-full md:w-full md:h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="p-2 sm:p-4 flex flex-col">

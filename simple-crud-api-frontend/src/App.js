@@ -15,6 +15,8 @@ import DirectChat from './Components/Chat/DirectChat';
 import Cart from './Components/Pages/Cart.jsx';
 import Success from './Components/Pages/Success.jsx';
 import Cancel from './Components/Pages/Cancel.jsx';
+import { ChevronDown, ChevronUp } from "lucide-react";
+
 
 const App = () => {
   const [products, setProducts] = useState([]);
@@ -55,7 +57,7 @@ const App = () => {
           <div className="app-container">
             <Navbar onProductsFetched={handleProductsFetched} />
             <Routes>
-            <Route path='/my-cart' element={<Cart/>}/>
+              <Route path='/my-cart' element={<Cart />} />
               <Route
                 path="/"
                 element={<ProductGridWrapper products={products} loading={loading} error={error} />}
@@ -83,8 +85,8 @@ const App = () => {
                 }
               />
               <Route path="/productpage" element={<ProductPage products={products} />} />
-              <Route path='/success' element={<Success/>}/>
-              <Route path='/cancel' element={<Cancel/>}/>
+              <Route path='/success' element={<Success />} />
+              <Route path='/cancel' element={<Cancel />} />
             </Routes>
           </div>
         </Router>
@@ -107,9 +109,9 @@ const ChatInterface = () => {
 
 
   return (
-    <div className="flex h-screen">
-      {/* User List Sidebar */}
-      <div className="w-1/4 border-r bg-white">
+    <div className="flex flex-col md:flex-row h-screen">
+      {/* User List Sidebar (Top on Mobile, Sidebar on Desktop) */}
+      <div className="w-full md:w-[30%] lg:w-1/4 border-b md:border-r md:border-b-0 bg-white">
         <UserList
           onSelectUser={(user) => {
             console.log('User selected:', user);
@@ -122,7 +124,7 @@ const ChatInterface = () => {
         />
       </div>
 
-      {/* Chat Window */}
+      {/* Chat Window (Below on Mobile, Right on Desktop) */}
       <div className="flex-1 bg-gray-50">
         {selectedUser?.id ? (
           <ChatWindow key={selectedUser?.id} selectedUser={selectedUser} />
@@ -131,10 +133,9 @@ const ChatInterface = () => {
             Select a user from the sidebar to start chatting
           </div>
         )}
-
-
       </div>
     </div>
+
   );
 };
 

@@ -133,7 +133,12 @@ const Cart = () => {
               <span className="text-xl font-bold">Total:</span>
               <span className="text-xl font-bold">${total.toFixed(2)}</span>
             </div>
-            <button onClick={makePayment} className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+            <button
+              onClick={makePayment}
+              disabled={cartItems.length === 0}
+              className={`w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors 
+    ${cartItems.length === 0 ? "disabled:cursor-not-allowed disabled:opacity-50" : ""}`}
+            >
               Checkout
             </button>
           </div>
