@@ -83,36 +83,6 @@ export const Navbar = ({ onProductsFetched }) => {
       <div className={`w-full md:w-auto md:flex md:items-center ${menuOpen ? 'block' : 'hidden'}`}>
         <div className="flex flex-col md:flex-row md:items-center gap-4 mt-4 md:mt-0">
           {/* Navigation Links */}
-          <ul className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-4">
-            <li>
-              <Link
-                to="/"
-                className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200 block md:inline-block w-full md:w-auto"
-              >
-                <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
-                <span className="relative z-10">Home</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/about"
-                className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-400 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200 block md:inline-block w-full md:w-auto"
-              >
-                <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
-                <span className="relative z-10">About</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                to="/contact"
-                className="relative text-stone-600 hover:text-white text-lg font-medium border-slate-200 py-2 px-4 rounded-lg group focus:outline-none overflow-hidden bg-slate-200 block md:inline-block w-full md:w-auto"
-              >
-                <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left rounded-lg"></span>
-                <span className="relative z-10">Contact</span>
-              </Link>
-            </li>
-          </ul>
 
           {/* Search Form - Mobile */}
           <form className="md:hidden flex flex-col space-y-2" onSubmit={handleSearch}>
@@ -192,11 +162,11 @@ export const Navbar = ({ onProductsFetched }) => {
       </div>
 
       {/* Desktop Right Section */}
-      <div className="hidden lg:flex items-center space-x-6">
+      <div className="hidden lg:flex items-center space-x-6 w-[80%]">
         <form className="flex items-center space-x-2" onSubmit={handleSearch}>
           <FaSearch className="text-slate-300 text-lg" />
           <input
-            className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 w-48"
+            className="pl-3 pr-[15rem] py-2 rounded-lg border border-gray-300 text-gray-700 w-[75%]"
             type="search"
             placeholder="Search"
             aria-label="Search"

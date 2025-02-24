@@ -16,6 +16,7 @@ import Cart from './Components/Pages/Cart.jsx';
 import Success from './Components/Pages/Success.jsx';
 import Cancel from './Components/Pages/Cancel.jsx';
 import { ChevronDown, ChevronUp } from "lucide-react";
+import NotificationIcon from './Components/NotificationIcon.jsx'
 
 
 const App = () => {
@@ -56,6 +57,7 @@ const App = () => {
         <Router>
           <div className="app-container">
             <Navbar onProductsFetched={handleProductsFetched} />
+            <NotificationIcon className='ml-[50%]'/>
             <Routes>
               <Route path='/my-cart' element={<Cart />} />
               <Route

@@ -25,6 +25,7 @@ const Cart = () => {
   }, []);
 
 
+
   const makePayment = async () => {
     const stripe = await loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY)
 
@@ -40,10 +41,13 @@ const Cart = () => {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/payment/create-checkout-session`, body, { headers });
 
       const session = response.data;
-
       const result = await stripe.redirectToCheckout({
         sessionId: session.id
       })
+      const cartId = cartItems._id
+       await axios.delete(`${process.env.REACT_APP_API_URL}/api/cart/${cartId}`,
+        { headers: { authorization: `Bearer ${token}` } }
+      )
     } catch (error) {
       console.log(error.message)
     }
