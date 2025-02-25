@@ -15,7 +15,6 @@ const ChatWindow = ({ selectedUser }) => {
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [page, setPage] = useState(1);
   const limit = 20;
-  console.log('selected user:',selectedUser)
 
   // Debug selectedUser changes
 
@@ -98,17 +97,6 @@ const ChatWindow = ({ selectedUser }) => {
   // Message handling
   const sendMessage = useCallback(async (e) => {
     e.preventDefault();
-
-    // Validate input conditions
-    if (!messageInput.trim() || !selectedUser?._id || !socket || isSending) {
-      console.log('Blocked send attempt. Reasons:', {
-        hasInput: !!messageInput.trim(),
-        validUser: !!selectedUser?.id,
-        socketConnected: !!socket,
-        isSending
-      });
-      return;
-    }
 
     // Validate user ID format
     if (!/^[0-9a-fA-F]{24}$/.test(selectedUser?._id)) {

@@ -23,7 +23,6 @@ const ProductPage = ({ products }) => {
 
       if (matchedProduct) {
         setProduct(matchedProduct);
-        console.log('sellerid', currentProduct.user_id);
         localStorage.setItem('sellerId', matchedProduct.user_id._id);
       } else {
         console.log('No product matched the selected ID.');

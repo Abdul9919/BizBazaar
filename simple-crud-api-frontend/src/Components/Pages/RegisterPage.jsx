@@ -31,7 +31,6 @@ const Register = () => {
                 password: form.password,
             });
             setSuccess('User registered successfully');
-            console.log('User registered:', response.data);
         } catch (error) {
             setError(error.response?.data?.message || 'An error occurred');
         }

@@ -28,13 +28,11 @@ const Dashboard = () => {
                 headers: { authorization: `Bearer ${token}` }
             });
 
-            const userProducts = response.data.filter(product => {
+            const userProducts = response.data.allProducts.filter(product => {
                 // Convert both IDs to strings for reliable comparison
                 const productUserId = product.user_id?._id || product.user_id;
                 return productUserId?.toString() === user.id.toString();
             });
-
-            console.log('Filtered products:', userProducts);
             setProducts(userProducts);
         } catch (err) {
             console.error('Fetch error:', err);

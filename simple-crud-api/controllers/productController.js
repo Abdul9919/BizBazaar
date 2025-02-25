@@ -24,8 +24,19 @@ const getProducts = async (req, res) => {
       filter.name = { $regex: search, $options: 'i' };
     }
 
-    const allProducts = await Product.find(filter).populate('user_id', 'userName').exec();
-    res.status(200).json(allProducts);
+    const page = parseInt(req.query.page)
+    const limit = parseInt(req.query.limit)
+
+
+
+    const allProducts = await Product.find(filter).populate('user_id', 'userName').skip((page-1) * limit).limit(limit).exec();
+    const totalProducts = await Product.countDocuments()
+    const totalPages = Math.ceil(totalProducts / limit);
+    res.status(200).json({
+      allProducts,
+      totalPages,
+      currentPage: page
+    });
   } catch (error) {
     console.error('Error fetching products:', error.message);
     res.status(500).json({ message: error.message });

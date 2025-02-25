@@ -98,17 +98,6 @@ const ChatWindow = ({ selectedUser }) => {
   const sendMessage = useCallback(async (e) => {
     e.preventDefault();
 
-    // Validate input conditions
-    if (!messageInput.trim() || !selectedUser?.id || !socket || isSending) {
-      console.log('Blocked send attempt. Reasons:', {
-        hasInput: !!messageInput.trim(),
-        validUser: !!selectedUser?.id,
-        socketConnected: !!socket,
-        isSending
-      });
-      return;
-    }
-
     // Validate user ID format
     if (!/^[0-9a-fA-F]{24}$/.test(selectedUser?.id)) {
       console.error('Invalid MongoDB ID:', selectedUser?.id);

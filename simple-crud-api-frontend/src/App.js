@@ -24,12 +24,20 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [clickedProduct, setClickedProduct] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/products`);
-        setProducts(response.data);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/products`, {
+          params: {
+            page: currentPage,
+            limit: 8,
+          },
+        });
+        setProducts(response.data.allProducts);
+        setTotalPages(response.data.totalPages);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching products:', err.message);
@@ -39,7 +47,21 @@ const App = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [currentPage]);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      console.log('next btn clicked')
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      console.log('prev btn clicked')
+    }
+  };
   /*
     const handleProductClick = () => {
      const tempProduct = products.filter((product) => product.id === clickedProduct.id);
@@ -57,12 +79,21 @@ const App = () => {
         <Router>
           <div className="app-container">
             <Navbar onProductsFetched={handleProductsFetched} />
-            <NotificationIcon className='ml-[50%]'/>
+            <NotificationIcon className='ml-[50%]' />
             <Routes>
               <Route path='/my-cart' element={<Cart />} />
               <Route
                 path="/"
-                element={<ProductGridWrapper products={products} loading={loading} error={error} />}
+                element={
+                  <ProductGridWrapper
+                    products={products}
+                    prevPage={handlePrevPage}
+                    nextPage={handleNextPage}
+                    currentPage={currentPage}
+                    loading={loading}
+                    error={error}
+                  />
+                }
               />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
@@ -100,14 +131,6 @@ const App = () => {
 const ChatInterface = () => {
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // Debug selected user changes
-  useEffect(() => {
-    console.log('Selected User in ChatInterface:', {
-      id: selectedUser?.id,
-      valid: selectedUser?.id ? /^[0-9a-fA-F]{24}$/.test(selectedUser.id) : false
-    });
-  }, [selectedUser]);
-
 
 
   return (
@@ -116,7 +139,6 @@ const ChatInterface = () => {
       <div className="w-full md:w-[30%] lg:w-1/4 border-b md:border-r md:border-b-0 bg-white">
         <UserList
           onSelectUser={(user) => {
-            console.log('User selected:', user);
             setSelectedUser({
               id: user.id,
               name: user.name,
@@ -145,14 +167,6 @@ const DirectChatInterface = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [sellerId, setSellerId] = useState(null);
 
-  // Debug selected user changes
-  useEffect(() => {
-    console.log('Selected User in ChatInterface:', {
-      id: selectedUser?.id,
-      valid: selectedUser?.id ? /^[0-9a-fA-F]{24}$/.test(selectedUser.id) : false
-    });
-  }, [selectedUser]);
-
   const fetchSellerId = async () => {
     try {
       const sellerId = localStorage.getItem('sellerId');
@@ -174,7 +188,6 @@ const DirectChatInterface = () => {
       <div className="w-1/4 border-r bg-white">
         <UserList
           onSelectUser={(user) => {
-            console.log('User selected:', user);
             setSelectedUser({
               id: user.id,
               name: user.name,
@@ -194,8 +207,10 @@ const DirectChatInterface = () => {
   );
 };
 
-const ProductGridWrapper = ({ products, loading, error }) => {
-  return <ProductGrid products={products} loading={loading} error={error} />;
+const ProductGridWrapper = ({ nextPage, prevPage, currentPage, products, loading, error }) => {
+  return <ProductGrid products={products} prevPage={prevPage}
+    nextPage={nextPage}
+    currentPage={currentPage} loading={loading} error={error} />;
 };
 
 const PrivateRoute = ({ children }) => {

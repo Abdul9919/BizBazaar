@@ -83,8 +83,6 @@ const Cart = () => {
     }
   };
 
-  console.log(cartItems)
-
   return (
     <>
       <div className="container absolute left-0 w-1/2 border-r-[1px] bg-gray-200 border-slate-400 border-b rounded-lg pl-0 p-4 my-[2rem] shadow-lg">

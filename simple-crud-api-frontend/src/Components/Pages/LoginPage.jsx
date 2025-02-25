@@ -25,9 +25,6 @@ const LoginPage = () => {
                 `${process.env.REACT_APP_API_URL}/api/users/login`,
                 { email, password }
             );
-    
-            // Verify response structure
-            console.log('Login response:', response.data);
             
             if (response.data && response.data._id) {
                 login(response.data.token, {
