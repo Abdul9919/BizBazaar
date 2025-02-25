@@ -78,7 +78,7 @@ const App = () => {
       <SocketProvider>
         <Router>
           <div className="app-container">
-            <Navbar onProductsFetched={handleProductsFetched} />
+            <Navbar products={products} onProductsFetched={handleProductsFetched} />
             <NotificationIcon className='ml-[50%]' />
             <Routes>
               <Route path='/my-cart' element={<Cart />} />

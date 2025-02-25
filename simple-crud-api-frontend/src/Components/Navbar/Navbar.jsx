@@ -5,7 +5,7 @@ import { AuthContext } from '../Contexts/AuthContext';
 import icon from '../../Assets/favicon.png';
 import { FaSearch, FaUser, FaBars, FaTimes, FaShoppingCart } from 'react-icons/fa';
 
-export const Navbar = ({ onProductsFetched }) => {
+export const Navbar = ({ onProductsFetched, products }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [username, setUsername] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -32,7 +32,7 @@ export const Navbar = ({ onProductsFetched }) => {
     if (searchTerm.trim()) {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/products?search=${searchTerm}`);
-        onProductsFetched(response.data);
+        onProductsFetched(response.data.allProducts);
       } catch (error) {
         console.error('Error fetching products:', error.message);
         alert('Failed to fetch products.');
@@ -63,7 +63,7 @@ export const Navbar = ({ onProductsFetched }) => {
           <Link to="/">
             <img src={icon} alt="" className="h-8 w-8 md:h-10 md:w-10" />
           </Link>
-          <Link to="/" className="text-white text-xl md:text-2xl font-bold">
+          <Link to="/" onClick={()=> window.location.reload()} className="text-white text-xl md:text-2xl font-bold">
             Biz Bazaar
           </Link>
         </div>
