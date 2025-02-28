@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser, getUserProfile, getUserById, getUsers } from '../controllers/userController.js';
+import { registerUser, loginUser, getUserProfile, getUserById, getUsers, updateUserSettings } from '../controllers/userController.js';
 const router = express.Router();
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -13,6 +13,7 @@ router.get('/', protect, getUsers);
 // Get the current user's profile (protected route)
 router.get('/profile', protect, getUserProfile);
 router.get('/profile/:id', getUserById);
+router.put('/:id',protect ,updateUserSettings)
 
 // New route to get the authenticated user's details
 router.get('/me', protect, async (req, res) => {

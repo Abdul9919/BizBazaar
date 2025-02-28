@@ -159,7 +159,7 @@ const Dashboard = () => {
     setUserSettings({ ...userSettings, [name]: value });
   };
 
-  const handleUpdateSettings = (e) => {
+  const handleUpdateSettings = async (e) => {
     e.preventDefault();
     
     // Validate passwords match
@@ -169,27 +169,48 @@ const Dashboard = () => {
     }
     
     setLoading(true);
-    
-    // In a real app, you would make an API call here to update user settings
-    // For now, we'll simulate it
-    setTimeout(() => {
-      setSuccess('Settings updated successfully!');
-      setLoading(false);
+    setError(null);
+    setSuccess(null);
+  
+    try {
+      // Send PUT request to update user settings
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/users/${user.id}`,  // Replace with actual user ID
+        {
+          userName: userSettings.userName,
+          email: userSettings.email,
+          currentPassword: userSettings.currentPassword,
+          newPassword: userSettings.newPassword,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${user.token}`,  // Pass token in header
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      setSuccess(response.data.message || 'Settings updated successfully!');
       
       // Reset password fields
-      setUserSettings({
-        ...userSettings,
+      setUserSettings((prev) => ({
+        ...prev,
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
-      });
-      
+      }));
+  
       // Clear success message after 3 seconds
       setTimeout(() => {
         setSuccess(null);
       }, 3000);
-    }, 1500);
+    } catch (error) {
+      setError(error.response?.data?.message || 'Failed to update settings');
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   const handleLogout = () => {
     logout();
@@ -203,9 +224,9 @@ const Dashboard = () => {
       <div 
         className={`${
           isSidebarOpen ? 'w-64' : 'w-20'
-        } bg-indigo-900 text-white transition-all duration-300 ease-in-out flex flex-col`}
+        } bg-gradient-to-b from-slate-800 to-slate-500 text-white transition-all duration-300 ease-in-out flex flex-col`}
       >
-        <div className="p-4 flex items-center justify-between border-b border-indigo-800">
+        <div className="p-4 flex items-center justify-between border-b bg-slate-850">
           <h1 className={`font-bold text-xl ${!isSidebarOpen && 'hidden'}`}>Dashboard</h1>
           <button 
             onClick={() => setSidebarOpen(!isSidebarOpen)}
