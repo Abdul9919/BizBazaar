@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET);
 const createStripeSession = async (req, res) => {
     try {
         const { products } = req.body;
-
+        
         const lineItems = products.map((product) => ({
             price_data: {
                 currency: 'usd',

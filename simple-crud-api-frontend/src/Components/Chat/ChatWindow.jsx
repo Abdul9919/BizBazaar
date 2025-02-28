@@ -98,37 +98,28 @@ const ChatWindow = ({ selectedUser }) => {
   const sendMessage = useCallback(async (e) => {
     e.preventDefault();
 
-    // Validate user ID format
-    if (!/^[0-9a-fA-F]{24}$/.test(selectedUser?.id)) {
-      console.error('Invalid MongoDB ID:', selectedUser?.id);
-      setError('Invalid recipient ID');
-      return;
-    }
+    if (!selectedUser?.id || !messageInput.trim()) return;
 
-    const tempId = Date.now();
+    const tempId = `temp-${Date.now()}`; // Generate a temporary unique ID
     const tempMessage = {
       _id: tempId,
-      sender: user.id,
-      receiver: selectedUser.id,
+      sender: user?.id, // ✅ Ensuring sender remains correct
+      receiver: selectedUser?.id,
       content: messageInput.trim(),
       timestamp: new Date(),
       status: 'sending'
     };
 
-    try {
-      setIsSending(true);
-      setError(null);
-      setMessageInput('');
-      setMessages(prev => [...prev, {
-        ...tempMessage,
-        timestamp: new Date(tempMessage.timestamp)
-      }]);
+    setMessages(prev => [...prev, tempMessage]); // ✅ Add temporary message
 
-      socket.emit('sendMessage',
-        {
-          receiverId: selectedUser.id,
-          content: messageInput.trim()
-        },
+    setMessageInput('');
+    setIsSending(true);
+
+    try {
+      socket.emit('sendMessage', { 
+          receiverId: selectedUser?.id, 
+          content: tempMessage.content 
+        }, 
         (response) => {
           if (response.status === 'error') {
             setMessages(prev => prev.filter(msg => msg._id !== tempId));
@@ -136,12 +127,11 @@ const ChatWindow = ({ selectedUser }) => {
             return;
           }
 
-          // Update message with server response
+          // ✅ Ensure the message update keeps the correct sender ID
           setMessages(prev => prev.map(msg =>
-            msg._id === tempId ? {
-              ...response.message,
-              status: 'delivered'
-            } : msg
+            msg._id === tempId
+              ? { ...msg, ...response.message, sender: user.id, status: 'delivered' }
+              : msg
           ));
         }
       );
@@ -149,31 +139,29 @@ const ChatWindow = ({ selectedUser }) => {
     } catch (err) {
       console.error('Send failed:', err);
       setMessages(prev => prev.filter(msg => msg._id !== tempId));
-      setMessageInput(messageInput);
-      setError(err.message.includes('Receiver not found')
-        ? 'User is no longer available'
-        : 'Failed to send message'
-      );
+      setError('Failed to send message');
     } finally {
       setIsSending(false);
     }
-  }, [socket, selectedUser, messageInput, user?.id, isSending]);
+}, [socket, selectedUser, messageInput, user?.id]);
+
 
   // Message listener
   useEffect(() => {
     if (!socket) return;
 
     const messageHandler = (message) => {
-      const parsedMessage = {
-        ...message,
-        timestamp: new Date(message.timestamp)
-      };
+        setMessages(prev => {
+            // ✅ Prevent duplicate messages from being added
+            if (prev.some(m => m._id === message._id)) return prev;
 
+            return [...prev, message];
+        });
     };
 
     socket.on('receiveMessage', messageHandler);
     return () => socket.off('receiveMessage', messageHandler);
-  }, [socket]);
+}, [socket]);
 
   // Connection error handling
 
@@ -261,32 +249,17 @@ const ChatWindow = ({ selectedUser }) => {
           </div>
         )}
 
-        {messages
-          .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
-          .map((msg) => (
-            <div
-              key={msg._id}
-              className={`flex ${msg.sender === user.id ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className={`max-w-xs p-3 rounded-lg relative ${msg.sender === user.id
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-white border'
-                } ${msg.status === 'sending' ? 'opacity-75' : ''}`}>
-                <p>{msg.content}</p>
-                <p className={`text-xs mt-1 ${msg.sender === user.id
-                    ? 'text-blue-100'
-                    : 'text-gray-500'
-                  }`}>
-                  {new Date(msg.timestamp).toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
-                  })}
-                  {msg.status === 'sending' && ' · Sending...'}
-                </p>
-              </div>
-            </div>
-          ))}
+{messages.map((msg) => (
+  <div key={msg._id} className={`flex ${msg.sender === user.id ? 'justify-end' : 'justify-start'}`}>
+    <div className={`max-w-xs p-3 rounded-lg relative ${msg.sender === user.id ? 'bg-blue-500 text-white' : 'bg-white border'}`}>
+      <p>{msg.content}</p>
+      <p className={`text-xs mt-1 ${msg.sender === user.id ? 'text-blue-100' : 'text-gray-500'}`}>
+        {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+        {msg.status === 'sending' && ' · Sending...'}
+      </p>
+    </div>
+  </div>
+))}
 
         {!hasMoreMessages && messages.length > 0 && (
           <div className="text-center text-gray-500 p-4 border-t">

@@ -79,7 +79,7 @@ const App = () => {
         <Router>
           <div className="app-container">
             <Navbar products={products} onProductsFetched={handleProductsFetched} />
-            <NotificationIcon className='ml-[50%]' />
+            
             <Routes>
               <Route path='/my-cart' element={<Cart />} />
               <Route

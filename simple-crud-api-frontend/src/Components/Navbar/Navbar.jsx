@@ -4,6 +4,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../Contexts/AuthContext';
 import icon from '../../Assets/favicon.png';
 import { FaSearch, FaUser, FaBars, FaTimes, FaShoppingCart } from 'react-icons/fa';
+import { SocketProvider } from '../Contexts/socketContext';
+import NotificationIcon from '../NotificationIcon';
 
 export const Navbar = ({ onProductsFetched, products }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -63,7 +65,9 @@ export const Navbar = ({ onProductsFetched, products }) => {
           <Link to="/">
             <img src={icon} alt="" className="h-8 w-8 md:h-10 md:w-10" />
           </Link>
-          <Link to="/" onClick={()=> window.location.reload()} className="text-white text-xl md:text-2xl font-bold">
+          <Link to="/" onClick={() => setInterval(() => {
+            window.location.reload()
+          }, 100)} className="text-white text-xl md:text-2xl font-bold">
             Biz Bazaar
           </Link>
         </div>
@@ -134,6 +138,9 @@ export const Navbar = ({ onProductsFetched, products }) => {
                   <FaShoppingCart size={24} color="white" />
                   <span>My Cart</span>
                 </button>
+                <SocketProvider>
+                <NotificationIcon className='ml-[50%]' />
+                </SocketProvider>
 
 
               </>
@@ -209,6 +216,9 @@ export const Navbar = ({ onProductsFetched, products }) => {
               <FaShoppingCart size={30} color="white" />
               My Cart
             </button>
+            <SocketProvider>
+                <NotificationIcon className='ml-[50%]' />
+                </SocketProvider>
           </div>
         ) : (
           <div className="flex items-right space-x-4" style={{ marginLeft: '15rem' }}>

@@ -114,11 +114,6 @@ const ProductPage = ({ products }) => {
               <button onClick={addProductToCart} className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition duration-300">
                 Add to Cart
               </button>
-
-              {/* Buy Now Button */}
-              <button className="bg-orange-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-orange-600 transition duration-300">
-                Buy Now
-              </button>
             </div>
           </div>
         </div>
