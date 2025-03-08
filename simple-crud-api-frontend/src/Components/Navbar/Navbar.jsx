@@ -7,7 +7,7 @@ import { FaSearch, FaUser, FaBars, FaTimes, FaShoppingCart } from 'react-icons/f
 import { SocketProvider } from '../Contexts/socketContext';
 import NotificationIcon from '../NotificationIcon';
 
-export const Navbar = ({ onProductsFetched, products }) => {
+export const Navbar = ({ onProductsFetched, products, currentPage }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [username, setUsername] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -58,16 +58,32 @@ export const Navbar = ({ onProductsFetched, products }) => {
   };
 
   return (
-    <nav className="rounded-lg flex flex-wrap items-center gap-4 bg-gradient-to-tr from-slate-950 to-slate-500 px-4 py-3 md:px-6 md:py-4">
+    <nav className="flex flex-wrap items-center gap-4 bg-gradient-to-tr from-slate-950 to-slate-500 px-4 py-3 md:px-6 md:py-4">
       {/* Left Section */}
       <div className="flex items-center justify-between w-full md:w-auto">
         <div className="flex items-center space-x-4 md:space-x-6">
           <Link to="/">
             <img src={icon} alt="" className="h-8 w-8 md:h-10 md:w-10" />
           </Link>
-          <Link to="/" onClick={() => setInterval(() => {
-            window.location.reload()
-          }, 100)} className="text-white text-xl md:text-2xl font-bold">
+          <Link
+            to="/"
+            onClick={async (e) => {
+              e.preventDefault(); // Prevent default navigation behavior
+              try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/products`, {
+                  params: {
+                    page: currentPage,
+                    limit: 8,
+                  },
+                });
+                onProductsFetched(response.data.allProducts);
+                navigate('/'); // Navigate to the home page without reloading
+              } catch (error) {
+                console.error('Error fetching products:', error.message);
+              }
+            }}
+            className="text-white text-xl md:text-2xl font-bold"
+          >
             Biz Bazaar
           </Link>
         </div>
@@ -104,6 +120,7 @@ export const Navbar = ({ onProductsFetched, products }) => {
             <button
               className="relative text-stone-800 hover:text-white px-4 py-2 rounded-lg overflow-hidden group bg-slate-200 w-full"
               type="submit"
+              onClick={() => navigate('/')}
             >
               <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left"></span>
               <span className="relative z-10">Search</span>
@@ -139,7 +156,7 @@ export const Navbar = ({ onProductsFetched, products }) => {
                   <span>My Cart</span>
                 </button>
                 <SocketProvider>
-                <NotificationIcon className='ml-[50%]' />
+                  <NotificationIcon className='ml-[50%]' />
                 </SocketProvider>
 
 
@@ -183,6 +200,7 @@ export const Navbar = ({ onProductsFetched, products }) => {
           <button
             className="relative text-stone-800 hover:text-white px-4 py-2 rounded-lg overflow-hidden group bg-slate-200"
             type="submit"
+            onClick={() => navigate('/')}
           >
             <span className="absolute inset-0 bg-slate-700 transition-all duration-800 ease-in-out transform scale-x-0 group-hover:scale-x-100 origin-left"></span>
             <span className="relative z-10">Search</span>
@@ -217,8 +235,8 @@ export const Navbar = ({ onProductsFetched, products }) => {
               My Cart
             </button>
             <SocketProvider>
-                <NotificationIcon className='ml-[50%]' />
-                </SocketProvider>
+              <NotificationIcon className='ml-[50%]' />
+            </SocketProvider>
           </div>
         ) : (
           <div className="flex items-right space-x-4" style={{ marginLeft: '15rem' }}>

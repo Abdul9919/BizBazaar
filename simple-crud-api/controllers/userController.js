@@ -155,39 +155,42 @@ const getUsers = async (req, res) => {
 
   const updateUserSettings = async (req, res) => {
     try {
-        const user = req.user; // Assuming user is already authenticated and attached to req
-
-        if (!user) {
-            return res.status(404).json({ message: 'User does not exist' });
-        }
-
-        const { userName, email, currentPassword, newPassword } = req.body;
-        const updateFields = {};
-
-        // Validate current password before updating
-        if (currentPassword && !(await user.matchPassword(currentPassword))) {
-            return res.status(401).json({ message: 'Invalid current password' });
-        }
-
-        // Only add fields to updateFields object if they are present in req.body
-        if (userName) updateFields.userName = userName;
-        if (email) updateFields.email = email;
-        if (newPassword) updateFields.password = newPassword; // Make sure password hashing is handled in the model
-
-        if (Object.keys(updateFields).length === 0) {
-            return res.status(400).json({ message: 'No valid fields to update' });
-        }
-
-        // Find and update user with only the provided fields
-        const updatedUser = await User.findByIdAndUpdate(user._id, updateFields, { new: true, runValidators: true });
-
-        res.status(200).json({ message: 'User updated successfully', user: updatedUser });
+      const user = await User.findById(req.user._id); // Get user from DB
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User does not exist' });
+      }
+  
+      const { userName, email, currentPassword, newPassword } = req.body;
+  
+      // Check if current password is correct
+      const isMatch = await user.matchPassword(currentPassword);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid Password' });
+      }
+  
+      // Create an update object dynamically (only include fields that exist in the request)
+      const updateFields = {};
+      if (userName) updateFields.userName = userName;
+      if (email) updateFields.email = email;
+      if (newPassword) {
+        const salt = await bcrypt.genSalt(10);
+        updateFields.password = await bcrypt.hash(newPassword, salt);
+      }
+  
+      // Update only the provided fields
+      const updatedUser = await User.findByIdAndUpdate(
+        req.user._id,
+        { $set: updateFields },
+        { new: true, runValidators: true }
+      );
+  
+      res.status(200).json(updatedUser);
     } catch (error) {
-        console.error('Update error:', error);
-        res.status(500).json({ message: 'Server error' });
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
     }
-};
-
+  };
 
 
 export { registerUser, loginUser, getUserProfile, getUserById, getUserForChat, getUsers, updateUserSettings };

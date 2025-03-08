@@ -1,9 +1,11 @@
 // database/db.js
 import mongoose from 'mongoose';
+import dotenv from 'dotenv'
+dotenv.config()
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB || 'mongodb+srv://admin:admin@backenddb.fek2y.mongodb.net/node-api?retryWrites=true&w=majority&appName=backendDB', {
+    const conn = await mongoose.connect(process.env.MONGO_DB || 'mongodb+srv://admin:admin@backenddb.fek2y.mongodb.net/node-api?retryWrites=true&w=majority&appName=backendDB', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

@@ -78,7 +78,7 @@ const App = () => {
       <SocketProvider>
         <Router>
           <div className="app-container">
-            <Navbar products={products} onProductsFetched={handleProductsFetched} />
+            <Navbar products={products} currentPage={currentPage} onProductsFetched={handleProductsFetched} />
             
             <Routes>
               <Route path='/my-cart' element={<Cart />} />

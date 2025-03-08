@@ -25,7 +25,7 @@ const LoginPage = () => {
                 `${process.env.REACT_APP_API_URL}/api/users/login`,
                 { email, password }
             );
-            
+
             if (response.data && response.data._id) {
                 login(response.data.token, {
                     _id: response.data._id,
@@ -39,6 +39,7 @@ const LoginPage = () => {
             }
         } catch (error) {
             console.error('Error logging in:', error.response?.data || error.message);
+            setError(error.response.data.message || error.message);
         }
     };
 
@@ -47,9 +48,12 @@ const LoginPage = () => {
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">Sign in to your account</h2>
             </div>
+            {/*error ? (<div className="fixed top-5 right-5 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500 animate-fadeOut">
+                {error}
+            </div>) : null*/}
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
+                {error && <div className="mb-4 bg-red-500 text-white text-center px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500 animate-fadeOut">{error}</div>}
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-900">Email address</label>
