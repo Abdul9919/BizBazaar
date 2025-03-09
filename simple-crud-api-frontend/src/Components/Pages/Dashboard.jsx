@@ -6,7 +6,25 @@ import { AuthContext } from '../Contexts/AuthContext.jsx';
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState('products');
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const useMobileResolution = () => {
+    const [isMobile, setIsMobile] = useState(
+      window.matchMedia("(max-width: 768px)").matches
+    );
+  
+    useEffect(() => {
+      const mediaQuery = window.matchMedia("(max-width: 768px)");
+      const handleChange = () => setIsMobile(mediaQuery.matches);
+  
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }, []);
+  
+    return isMobile;
+  };
+
+  const isMobile = useMobileResolution();
+  const [state, setState] = useState(isMobile);
+  const [isSidebarOpen, setSidebarOpen] = useState(state ? false : true);
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: '',
@@ -28,8 +46,32 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
+
   // Get token from localStorage
   const token = localStorage.getItem('token');
+
+  /*const useMobileResolution = () => {
+    const [isMobile, setIsMobile] = useState(
+      window.matchMedia("(max-width: 768px)").matches
+    );
+  
+    useEffect(() => {
+      const mediaQuery = window.matchMedia("(max-width: 768px)");
+      const handleChange = () => setIsMobile(mediaQuery.matches);
+  
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }, []);
+  
+    return isMobile;
+  };*/
+
+  //const isMobile = useMobileResolution();
+  //const [state, setState] = useState(isMobile); 
+
+  useEffect(() => {
+    setState(isMobile); // Update state based on resolution
+  }, [isMobile]);
 
   // Fetch products from API
   const fetchProducts = async () => {
@@ -223,13 +265,13 @@ const Dashboard = () => {
       {/* Sidebar */}
       <div 
         className={`${
-          isSidebarOpen ? 'w-64' : 'w-20'
+          isSidebarOpen ? 'lg:w-64' : 'md:w-20 sm:w-20'
         } bg-gradient-to-b from-slate-800 to-slate-500 text-white transition-all duration-300 ease-in-out flex flex-col`}
       >
         <div className="p-4 flex items-center justify-between border-b bg-slate-850">
           <h1 className={`font-bold text-xl ${!isSidebarOpen && 'hidden'}`}>Dashboard</h1>
-          <button 
-            onClick={() => setSidebarOpen(!isSidebarOpen)}
+          <button
+            onClick={() => !state && setSidebarOpen(!isSidebarOpen)}
             className="p-1 rounded-md hover:bg-indigo-800 transition-colors"
           >
             <Menu size={24} />
