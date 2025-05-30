@@ -84,3 +84,5 @@ server.listen(port,'0.0.0.0', () => {
   console.log(`Server running at http://localhost:${port}`);
   console.log('Allowed origins:', allowedOrigins);
 });
+
+//just adding this comment to redeploy on git to restart the server
