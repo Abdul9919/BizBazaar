@@ -84,7 +84,7 @@ export const Navbar = ({ onProductsFetched, products, currentPage }) => {
             }}
             className="text-white text-xl md:text-2xl font-bold"
           >
-            Biz Bazaar
+            Biz Bazar
           </Link>
         </div>
 
